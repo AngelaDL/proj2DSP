@@ -43,6 +43,7 @@ public class MetronomeBolt extends BaseRichBolt {
             Values values = new Values();
             values.add(time);
             values.add(currentTimestamp);
+            System.out.println("E' PASSATA UN ORA");
             _collector.emit(METRONOME_H_STREAM_ID, values);
         }
 
@@ -52,6 +53,7 @@ public class MetronomeBolt extends BaseRichBolt {
             Values values = new Values();
             values.add(time);
             values.add(currentTimestamp);
+            System.out.println("E' PASSATO UN GIORNO");
             _collector.emit(METRONOME_D_STREAM_ID, values);
         }
 
@@ -61,7 +63,7 @@ public class MetronomeBolt extends BaseRichBolt {
 
     private long roundToCompletedHour(Long timestamp) {
 
-        Date d = new Date(timestamp*1000);
+        Date d = new Date(timestamp);
         Calendar date = new GregorianCalendar();
         date.setTime(d);
         date.set(Calendar.SECOND, 0);
