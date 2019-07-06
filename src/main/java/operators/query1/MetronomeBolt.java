@@ -34,14 +34,17 @@ public class MetronomeBolt extends BaseRichBolt {
         long time = tuple.getLongByField(CREATE_DATE);
         long currentTimestamp = tuple.getLongByField(CURRENT_TIMESTAMP);
 
-        if (this.elapsedTime_h == 0)
+        if (this.elapsedTime_h == 0) {
             this.elapsedTime_h = time;
-        if (this.elapsedTime_d == 0)
+            return;
+        }
+        if (this.elapsedTime_d == 0) {
             this.elapsedTime_d = time;
+            return;
+        }
 
-        else {
             // Metronome sends tick every hour
-            if (time - this.elapsedTime_h >= MILLIS_H) {
+            if (this.elapsedTime_h != 0 && time - this.elapsedTime_h >= MILLIS_H) {
                 this.elapsedTime_h = 0;
                 Values values = new Values();
                 values.add(time);
@@ -50,14 +53,14 @@ public class MetronomeBolt extends BaseRichBolt {
             }
 
             // Metronome sends tick every day
-            if (time - this.elapsedTime_d >= MILLIS_D) {
+            if (this.elapsedTime_d != 0 && time - this.elapsedTime_d >= MILLIS_D) {
                 this.elapsedTime_d = 0;
                 Values values = new Values();
                 values.add(time);
                 values.add(currentTimestamp);
                 _collector.emit(METRONOME_D_STREAM_ID, values);
             }
-        }
+
 
         _collector.ack(tuple);
     }
