@@ -85,11 +85,6 @@ public class Datasource2 implements Runnable {
 
     }
 
-    private long computeBatchFinalTime(long initialTime){
-
-        return initialTime + TIMESPAN * 60 * 1000;
-    }
-
     public static void main(String[] args) {
 
         Datasource2 fill = new Datasource2();

@@ -44,4 +44,5 @@ public class Configuration {
     public static final String PARSER_STREAM_ID = "parser";
     public static final String ESTIMATED_TOTAL = "estimated_total";
     public static final String PARTIAL_RANKING = "partial_ranking";
+    public static final String COMMENT_TYPE = "comment_type";
 }

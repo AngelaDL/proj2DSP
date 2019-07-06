@@ -32,7 +32,7 @@ public class CountByHourBolt extends BaseRichBolt {
 
         // When a tick by metronome is received, it handles the window shifting operations
         if (msgType.equals(METRONOME_H_STREAM_ID)) {
-            long tupleTimestamp = tuple.getLongByField(TIMESTAMP);
+            long tupleTimestamp = tuple.getLongByField(CREATE_DATE);
             long currentTimestamp = tuple.getLongByField(CURRENT_TIMESTAMP);
             int elapsedHour = (int) Math.ceil((tupleTimestamp - lastTick) / MetronomeBolt.MILLIS_H);
             System.err.println("ELAPSED: " + elapsedHour);

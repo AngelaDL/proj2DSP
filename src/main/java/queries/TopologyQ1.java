@@ -56,7 +56,5 @@ public class TopologyQ1 {
 
         localCluster.submitTopology("query1", conf, builder.createTopology());
 
-
-
     }
 }

@@ -1,4 +1,4 @@
-package datasource;
+package main.java.datasource;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -12,7 +12,7 @@ public class Datasource {
 
     public static void main(String[] args) {
 
-        SimpleKakfaProducer producer = new SimpleKakfaProducer(Configuration.TOPIC_1_INPUT);
+        SimpleKakfaProducer producer = new SimpleKakfaProducer(Configuration.TOPIC_2_INPUT);
 
         BufferedReader br = null;
         String line = "";

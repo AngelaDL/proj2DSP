@@ -32,7 +32,9 @@ public class CountByDay extends BaseRichBolt {
 
         // When a tick by metronome is received, it handles the window shifting operations
         if (msgType.equals(METRONOME_D_STREAM_ID)) {
-            long tupleTimestamp = tuple.getLongByField(CURRENT_TIMESTAMP);
+            long tupleTimestamp = tuple.getLongByField(CREATE_DATE);
+            long timestamp = tuple.getLongByField(CURRENT_TIMESTAMP);
+
 
         }
 

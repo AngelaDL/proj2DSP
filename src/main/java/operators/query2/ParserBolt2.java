@@ -4,7 +4,9 @@ import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.topology.base.BaseRichBolt;
+import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
+import org.apache.storm.tuple.Values;
 
 import java.util.Map;
 
@@ -44,12 +46,21 @@ public class ParserBolt2 extends BaseRichBolt {
 
         String[] splitted = rawdata.split(",");
 
+        String create_date = splitted[5];
+        String comment_type = splitted[4];
 
 
+        if(comment_type.equals("comment")) {
+            //System.out.println("COMMENT TYPE: " + comment_type);
+            Values values = new Values(Long.parseLong(create_date), comment_type, currentTimestamp);
+            System.out.println("VALUES QUERY 2: " + values);
+            _collector.emit(values);
+        }
+        _collector.ack(tuple);
     }
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-
+        outputFieldsDeclarer.declare(new Fields(CREATE_DATE, COMMENT_TYPE, CURRENT_TIMESTAMP));
     }
 }
