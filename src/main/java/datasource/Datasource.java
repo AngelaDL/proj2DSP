@@ -5,7 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
-import config.Configuration;
+import main.java.config.Configuration;
 import main.java.kafka.*;
 
 public class Datasource {

@@ -14,16 +14,16 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
-import static config.Configuration.*;
+import static main.java.config.Configuration.*;
 
 public class ParserBolt extends BaseRichBolt {
 
     private OutputCollector _collector;
-    private SimpleDateFormat sdf;
+    //private SimpleDateFormat sdf;
 
     @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
-        this.sdf = new SimpleDateFormat();
+        //this.sdf = new SimpleDateFormat();
         this._collector = outputCollector;
     }
 
@@ -49,7 +49,7 @@ public class ParserBolt extends BaseRichBolt {
     public void execute(Tuple tuple) {
 
         String rawdata = tuple.getStringByField(RAW_DATA);
-        long currentTimestamp = tuple.getLongByField(CURRENNT_TIMESTAMP);
+        long currentTimestamp = tuple.getLongByField(CURRENT_TIMESTAMP);
         //System.out.println("RAWDATA: " + rawdata);
         //System.out.println("TIMESTAMP: " + currentTimestamp);
         String[] splitted = rawdata.split(",");
@@ -75,7 +75,7 @@ public class ParserBolt extends BaseRichBolt {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields(CREATE_DATE, ARTICLE_ID, CURRENNT_TIMESTAMP));
+        outputFieldsDeclarer.declare(new Fields(CREATE_DATE, ARTICLE_ID, CURRENT_TIMESTAMP));
     }
 
     private boolean validateTuple(String[] fields) {

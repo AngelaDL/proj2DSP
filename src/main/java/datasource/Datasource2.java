@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.TimeZone;
 
-import static config.Configuration.*;
+import static main.java.config.Configuration.*;
 
 public class Datasource2 implements Runnable {
 

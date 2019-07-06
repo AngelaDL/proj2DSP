@@ -9,7 +9,7 @@ import org.apache.storm.tuple.Tuple;
 
 import java.util.Map;
 
-import static config.Configuration.*;
+import static main.java.config.Configuration.*;
 
 public class CountByDay extends BaseRichBolt {
 
@@ -32,7 +32,7 @@ public class CountByDay extends BaseRichBolt {
 
         // When a tick by metronome is received, it handles the window shifting operations
         if (msgType.equals(METRONOME_D_STREAM_ID)) {
-            long tupleTimestamp = tuple.getLongByField(TIMESTAMP);
+            long tupleTimestamp = tuple.getLongByField(CURRENT_TIMESTAMP);
 
         }
 

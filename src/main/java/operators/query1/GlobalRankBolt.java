@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import static config.Configuration.*;
+import static main.java.config.Configuration.*;
 
 public class GlobalRankBolt extends BaseRichBolt {
 
@@ -52,7 +52,7 @@ public class GlobalRankBolt extends BaseRichBolt {
     public void execute(Tuple tuple) {
         boolean updated = false;
         long tupleTimestamp = tuple.getLongByField(CREATE_DATE);
-        long currentTimestamp = tuple.getLongByField(CURRENNT_TIMESTAMP);
+        long currentTimestamp = tuple.getLongByField(CURRENT_TIMESTAMP);
         //String metronomeMsg = tuple.getStringByField(METRONOME_H_STREAM_ID);
         //String articleID = tuple.getStringByField(PARSER_QUERY_1[1]);
         //long estimatedTotal = tuple.getLongByField(ESTIMATED_TOTAL);

@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
 
-import static config.Configuration.*;
+import static main.java.config.Configuration.*;
 
 public class KafkaSpout extends BaseRichSpout {
 
@@ -56,6 +56,6 @@ public class KafkaSpout extends BaseRichSpout {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields(RAW_DATA, CURRENNT_TIMESTAMP));
+        outputFieldsDeclarer.declare(new Fields(RAW_DATA, CURRENT_TIMESTAMP));
     }
 }

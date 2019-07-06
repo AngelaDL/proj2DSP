@@ -10,7 +10,7 @@ import org.apache.storm.tuple.Values;
 
 import java.util.Map;
 
-import static config.Configuration.*;
+import static main.java.config.Configuration.*;
 
 public class SamplingBolt extends BaseRichBolt {
 
@@ -27,7 +27,7 @@ public class SamplingBolt extends BaseRichBolt {
             //String timestamp = tuple.getStringByField(CREATE_DATE);
             //System.out.println("SAMPLING TIMESTAMP: " + timestamp);
             long timestamp = tuple.getLongByField(CREATE_DATE);
-            long originalTupleTimestamp = tuple.getLongByField(CURRENNT_TIMESTAMP);
+            long originalTupleTimestamp = tuple.getLongByField(CURRENT_TIMESTAMP);
 
             Values values = new Values();
             values.add(timestamp);
@@ -39,7 +39,7 @@ public class SamplingBolt extends BaseRichBolt {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields(CREATE_DATE, CURRENNT_TIMESTAMP));
+        outputFieldsDeclarer.declare(new Fields(CREATE_DATE, CURRENT_TIMESTAMP));
     }
 
     private boolean checkPercentage() {

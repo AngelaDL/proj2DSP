@@ -12,7 +12,7 @@ import org.apache.storm.tuple.Values;
 import java.util.HashMap;
 import java.util.Map;
 
-import static config.Configuration.*;
+import static main.java.config.Configuration.*;
 
 public class CountByHourBolt extends BaseRichBolt {
     private Map<String, Window> map;
@@ -33,7 +33,7 @@ public class CountByHourBolt extends BaseRichBolt {
         // When a tick by metronome is received, it handles the window shifting operations
         if (msgType.equals(METRONOME_H_STREAM_ID)) {
             long tupleTimestamp = tuple.getLongByField(TIMESTAMP);
-            long currentTimestamp = tuple.getLongByField(CURRENNT_TIMESTAMP);
+            long currentTimestamp = tuple.getLongByField(CURRENT_TIMESTAMP);
             int elapsedHour = (int) Math.ceil((tupleTimestamp - lastTick) / MetronomeBolt.MILLIS_H);
             System.err.println("ELAPSED: " + elapsedHour);
 
@@ -80,6 +80,6 @@ public class CountByHourBolt extends BaseRichBolt {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields(CREATE_DATE, CURRENNT_TIMESTAMP, METRONOME_H_STREAM_ID, ARTICLE_ID, ESTIMATED_TOTAL));
+        outputFieldsDeclarer.declare(new Fields(CREATE_DATE, CURRENT_TIMESTAMP, METRONOME_H_STREAM_ID, ARTICLE_ID, ESTIMATED_TOTAL));
     }
 }

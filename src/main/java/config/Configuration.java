@@ -1,4 +1,4 @@
-package config;
+package main.java.config;
 
 public class Configuration {
 
@@ -35,7 +35,7 @@ public class Configuration {
     // Data fields
     public static final String TIMESTAMP = "timestamp";
     public static final String RAW_DATA = "rawdata";
-    public static final String CURRENNT_TIMESTAMP = "current";
+    public static final String CURRENT_TIMESTAMP = "current";
     public static final String CREATE_DATE = "create_date";
     public static final String ARTICLE_ID = "article_id";
     //public static final String[] PARSER_QUERY_1 = {"create_date", "article_id"};

@@ -11,7 +11,7 @@ import org.apache.storm.tuple.Values;
 
 import java.util.Map;
 
-import static config.Configuration.*;
+import static main.java.config.Configuration.*;
 
 public class MetronomeBolt extends BaseRichBolt {
 
@@ -32,7 +32,7 @@ public class MetronomeBolt extends BaseRichBolt {
     @Override
     public void execute(Tuple tuple) {
         long time = tuple.getLongByField(CREATE_DATE);
-        long currentTimestamp = tuple.getLongByField(CURRENNT_TIMESTAMP);
+        long currentTimestamp = tuple.getLongByField(CURRENT_TIMESTAMP);
 
         if (this.elapsedTime_h == 0)
             this.elapsedTime_h = time;
@@ -65,7 +65,7 @@ public class MetronomeBolt extends BaseRichBolt {
     @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
         //TODO controllare bene...forse bisogna usare declareStream??
-        outputFieldsDeclarer.declareStream(METRONOME_H_STREAM_ID, new Fields(CREATE_DATE, CURRENNT_TIMESTAMP));
-        outputFieldsDeclarer.declareStream(METRONOME_D_STREAM_ID, new Fields(CREATE_DATE, CURRENNT_TIMESTAMP));
+        outputFieldsDeclarer.declareStream(METRONOME_H_STREAM_ID, new Fields(CREATE_DATE, CURRENT_TIMESTAMP));
+        outputFieldsDeclarer.declareStream(METRONOME_D_STREAM_ID, new Fields(CREATE_DATE, CURRENT_TIMESTAMP));
     }
 }

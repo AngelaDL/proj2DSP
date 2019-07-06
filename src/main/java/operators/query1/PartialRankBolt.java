@@ -13,7 +13,7 @@ import org.apache.storm.tuple.Values;
 
 import java.util.Map;
 
-import static config.Configuration.*;
+import static main.java.config.Configuration.*;
 
 public class PartialRankBolt extends BaseRichBolt {
     private OutputCollector _collector;
@@ -33,7 +33,7 @@ public class PartialRankBolt extends BaseRichBolt {
     @Override
     public void execute(Tuple tuple) {
         long tupleTimestamp = tuple.getLongByField(CREATE_DATE);
-        long currentTimestamp = tuple.getLongByField(CURRENNT_TIMESTAMP);
+        long currentTimestamp = tuple.getLongByField(CURRENT_TIMESTAMP);
         String metronomeMsg = tuple.getStringByField(METRONOME_H_STREAM_ID);
         String articleID = tuple.getStringByField(ARTICLE_ID);
         long estimatedTotal = tuple.getLongByField(ESTIMATED_TOTAL);
@@ -62,6 +62,6 @@ public class PartialRankBolt extends BaseRichBolt {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields(CREATE_DATE, CURRENNT_TIMESTAMP, PARTIAL_RANKING, METRONOME_H_STREAM_ID));
+        outputFieldsDeclarer.declare(new Fields(CREATE_DATE, CURRENT_TIMESTAMP, PARTIAL_RANKING, METRONOME_H_STREAM_ID));
     }
 }
