@@ -1,6 +1,6 @@
 package main.java.kafka;
 
-import config.Configuration;
+import main.java.config.Configuration;
 import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.serialization.StringSerializer;
 

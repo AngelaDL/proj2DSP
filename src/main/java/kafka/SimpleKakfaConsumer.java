@@ -1,6 +1,6 @@
 package main.java.kafka;
 
-import config.Configuration;
+import main.java.config.Configuration;
 
 import java.util.Arrays;
 import java.util.List;

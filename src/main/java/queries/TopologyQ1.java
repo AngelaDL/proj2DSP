@@ -5,7 +5,7 @@ import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
 import org.apache.storm.topology.TopologyBuilder;
 
-import static config.Configuration.*;
+import static main.java.config.Configuration.*;
 
 public class TopologyQ1 {
 
