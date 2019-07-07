@@ -29,7 +29,7 @@ public class SlotBasedWindow {
     public static int getSlot(long timestamp) {
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTimeZone(TimeZone.getTimeZone("GMT+1"));
-        calendar.setTimeInMillis(timestamp*1000);
+        calendar.setTimeInMillis(timestamp);
         System.out.println("Current time is: " + calendar.getTime());
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         System.out.println("HOUR: " + hour);
@@ -98,6 +98,10 @@ public class SlotBasedWindow {
         s += "]";
         return s;
 
+    }
+
+    public long[] getTimeframes() {
+        return this.timeframes;
     }
 
     public int getEstimatedTotal() {

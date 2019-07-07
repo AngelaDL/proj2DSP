@@ -38,17 +38,16 @@ public class MetronomeBolt extends BaseRichBolt {
         long currentTimestamp = tuple.getLongByField(CURRENT_TIMESTAMP);
 
         // Metronome sends tick every hour
-        if (this.time_h < time && (time - this.time_h) >= 3600) {
+        if (this.time_h < time && (time - this.time_h) >= MILLIS_H) {
             this.time_h = roundToCompletedHour(time);
             Values values = new Values();
             values.add(time);
             values.add(currentTimestamp);
-            System.out.println("CAZZO");
             _collector.emit(METRONOME_H_STREAM_ID, values);
         }
 
         // Metronome sends tick every day
-        if (this.time_d < time && (time - this.time_d) >= 86400) {
+        if (this.time_d < time && (time - this.time_d) >= MILLIS_D) {
             this.time_d = roundToCompletedDay(time);
             Values values = new Values();
             values.add(time);

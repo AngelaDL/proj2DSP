@@ -1,4 +1,4 @@
-package main.java.operators.query1;
+package main.java.operators;
 
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;

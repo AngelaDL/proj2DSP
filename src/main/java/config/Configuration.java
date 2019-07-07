@@ -27,7 +27,7 @@ public class Configuration {
     public static final String GLOBAL_GROUP_ID = "nyt-comments";
 
     // Dataset configuration
-    public static final String DATASET = "/home/simone/IdeaProjects/proj2DSP/data/Comments_jan-apr2018.csv";
+    public static final String DATASET = "/home/angela/IdeaProjects/proj2DSP/data/Comments_jan-apr2018.csv";
 
     // Discard probability for the SamplingBolt
     public static final int PERCENT = 10;

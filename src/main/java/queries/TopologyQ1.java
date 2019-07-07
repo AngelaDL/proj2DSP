@@ -1,5 +1,7 @@
 package main.java.queries;
 
+import main.java.operators.MetronomeBolt;
+import main.java.operators.SamplingBolt;
 import main.java.operators.query1.*;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
