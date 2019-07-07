@@ -30,7 +30,7 @@ public class Configuration {
     public static final String DATASET = "/home/angela/IdeaProjects/proj2DSP/data/Comments_jan-apr2018.csv";
 
     // Discard probability for the SamplingBolt
-    public static final int PERCENT = 10;
+    public static final double PERCENT = 0.1;
 
     // Data fields
     public static final String TIMESTAMP = "timestamp";

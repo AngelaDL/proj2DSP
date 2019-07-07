@@ -21,20 +21,9 @@ public class SlotBasedWindow {
     }
 
     public void updateSlot (long timestamp) {
-        int i = getSlot(timestamp);
+        int i = DateUtils.getSlot(timestamp);
         this.timeframes[i] = timeframes[i] + 1;
         estimatedTotal += 1;
-    }
-
-    public static int getSlot(long timestamp) {
-        Calendar calendar = GregorianCalendar.getInstance();
-        calendar.setTimeZone(TimeZone.getTimeZone("GMT+1"));
-        calendar.setTimeInMillis(timestamp);
-        //System.out.println("Current time is: " + calendar.getTime());
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        //System.out.println("HOUR: " + hour);
-
-        return hour/2;
     }
 
     public long moveForward(){
