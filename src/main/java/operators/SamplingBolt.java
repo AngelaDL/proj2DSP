@@ -44,7 +44,7 @@ public class SamplingBolt extends BaseRichBolt {
 
     private boolean checkPercentage() {
         double p = Math.random();
-        if (p < PERCENT/100)
+        if (p < PERCENT)
             return false;
         return true;
     }

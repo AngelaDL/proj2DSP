@@ -61,12 +61,12 @@ public class ParserBolt extends BaseRichBolt {
         //System.err.println("TIMESTAMP: " + timestamp);
         //if (validateTuple(splitted)) {
 
-        Values values = new Values(Long.parseLong(timestamp), article_id, currentTimestamp);
+        Values values = new Values(Long.parseLong(timestamp) * 1000, article_id, currentTimestamp);
         //values.add(splitted[1]);
         //values.add(splitted[5]);
         //values.add(currentTimestamp);
 
-        System.out.println("PARSER VALUES: " +  values);
+        //System.out.println("PARSER VALUES: " +  values);
 
         _collector.emit(values);
         //}

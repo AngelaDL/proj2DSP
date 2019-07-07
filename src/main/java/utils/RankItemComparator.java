@@ -5,15 +5,12 @@ import java.util.Comparator;
 public class RankItemComparator implements Comparator<RankItem> {
 
 	@Override
-	public int compare(RankItem o1, RankItem o2) {
-		
-		if (o1.getPopularity() == o2.getPopularity()
-				&& !o1.getArticleID().equals(o2.getArticleID())){
-			//return - (int) (o1.getTimestamp() - o2.getTimestamp());
-		}
-		
-		//return -(o1.getPopularity() - o2.getPopularity());
-		return 0;
+	public int compare(RankItem r1, RankItem r2) {
+
+		Long count1 = r1.getPopularity();
+		Long count2 = r2.getPopularity();
+
+		return -count1.compareTo(count2); //rank in descending order
 	}
 
 }

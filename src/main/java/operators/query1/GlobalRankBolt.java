@@ -59,11 +59,15 @@ public class GlobalRankBolt extends BaseRichBolt {
 
         Ranking partialRanking = (Ranking) tuple.getValueByField(PARTIAL_RANKING);
 
-        for (RankItem item : partialRanking.getRanking())
+        for (RankItem item : partialRanking.getRanking()) {
             updated |= topKranking.update(item);
+            System.out.println(updated);
+        }
 
-        if (updated)
+        if (updated) {
+            //System.out.println("Sono entrato");
             createOutputResponse(currentTimestamp, tupleTimestamp);
+        }
 
         _collector.ack(tuple);
     }
@@ -75,16 +79,19 @@ public class GlobalRankBolt extends BaseRichBolt {
     }
 
     private void createOutputResponse(long currentTimestamp, long tupleTimestamp) {
-        String result = "";
+        String result = tupleTimestamp + ", ";
         List<RankItem> globalRanking = this.topKranking.getTopK().getRanking();
 
-        result.concat(String.valueOf(tupleTimestamp)).concat(", ");
 
-        for (int i=0; i< globalRanking.size(); i++)
-            result.concat(globalRanking.get(i).getArticleID())
-                   .concat(", ").concat(String.valueOf(globalRanking.get(i).getPopularity()));
+        String[] results = new String[globalRanking.size()];
 
-        System.err.println("FINAL RESULT: " + result);
+        for (int i=0; i< globalRanking.size(); i++) {
+            results[i] = globalRanking.get(i).getArticleID() + ", " + globalRanking.get(i).getPopularity();
+            //result += globalRanking.get(i).getArticleID() + ", " + globalRanking.get(i).getPopularity();
+        }
+
+        for (int j=0; j<results.length; j++)
+            System.out.println("--> " + results[j]);
 
         producer.send(new ProducerRecord<String, String>(this.kafkaTopic, result));
     }

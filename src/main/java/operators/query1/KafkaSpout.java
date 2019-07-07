@@ -40,14 +40,14 @@ public class KafkaSpout extends BaseRichSpout {
 
     @Override
     public void nextTuple() {
-        System.err.println("SPOUTTTTTTTTTTTTTTTTTTTTTTTTTTTT");
+        //System.err.println("SPOUTTTTTTTTTTTTTTTTTTTTTTTTTTTT");
         while (true) {
             ConsumerRecords<String, String> recs = consumer.poll(100);
             for (ConsumerRecord<String, String> rec : recs) {
                 Values values = new Values();
                 values.add(rec.value());
                 values.add(System.currentTimeMillis());
-                System.err.println("VALUES: " + values);
+                //System.err.println("VALUES: " + values);
 
                 _collector.emit(values);
             }

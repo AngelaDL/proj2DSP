@@ -36,7 +36,8 @@ public class CountByHourBolt extends BaseRichBolt {
             long tupleTimestamp = tuple.getLongByField(CREATE_DATE);
             long currentTimestamp = tuple.getLongByField(CURRENT_TIMESTAMP);
             int elapsedHour = (int) Math.ceil((tupleTimestamp - lastTick) / MetronomeBolt.MILLIS_H);
-            System.err.println("ELAPSED: " + elapsedHour);
+            System.out.println(msgType);
+            //System.err.println("ELAPSED: " + elapsedHour);
 
             // Control: only informations relating to the current window are processed
             for (String articleID : this.map.keySet()) {
@@ -61,8 +62,8 @@ public class CountByHourBolt extends BaseRichBolt {
             String articleID = tuple.getStringByField(ARTICLE_ID);
             long timestamp = tuple.getLongByField(CREATE_DATE);
 
-            System.out.println("COUNT ARTICLE_ID: " + articleID);
-            System.out.println("COUNT TIMESTAMP: " + timestamp);
+            //System.out.println("COUNT ARTICLE_ID: " + articleID);
+            //System.out.println("COUNT TIMESTAMP: " + timestamp);
 
             // Control: only informations relating to the current window are processed
             if (timestamp > this.lastTick) {
@@ -73,7 +74,7 @@ public class CountByHourBolt extends BaseRichBolt {
                     map.put(articleID, window); // This is a tumbling window
                 }
 
-                System.out.println("WINDOW: " + window.getEstimatedTotal());
+                //System.out.println("WINDOW: " + window.getEstimatedTotal());
                 window.increment();
             }
         }
