@@ -34,7 +34,7 @@ public class PartialRankBolt extends BaseRichBolt {
     public void execute(Tuple tuple) {
         long tupleTimestamp = tuple.getLongByField(CREATE_DATE);
         long currentTimestamp = tuple.getLongByField(CURRENT_TIMESTAMP);
-        String metronomeMsg = tuple.getStringByField(METRONOME_H_STREAM_ID);
+        String metronomeMsg = tuple.getStringByField(METRONOME_D_STREAM_ID);
         String articleID = tuple.getStringByField(ARTICLE_ID);
         long estimatedTotal = tuple.getLongByField(ESTIMATED_TOTAL);
 

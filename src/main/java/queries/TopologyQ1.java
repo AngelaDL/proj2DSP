@@ -16,6 +16,7 @@ public class TopologyQ1 {
     private static final String SAMPLING = "sampling";
     private static final String METRONOME = "metronome";
     private static final String COUNT_BY_H = "countByH";
+    private static final String COUNT_BY_D = "countByD";
     private static final String PARTIAL = "partial";
     private static final String GLOBAL = "global";
 
@@ -35,12 +36,12 @@ public class TopologyQ1 {
         builder.setBolt(METRONOME, new MetronomeBolt(), 1)
                 .allGrouping(SAMPLING);
 
-        builder.setBolt(COUNT_BY_H, new CountByHourBolt(), 1)
+        builder.setBolt(COUNT_BY_D, new CountByDayBolt(), 1)
                 .allGrouping(PARSER)
-                .allGrouping(METRONOME, METRONOME_H_STREAM_ID);
+                .allGrouping(METRONOME, METRONOME_D_STREAM_ID);
 
         builder.setBolt(PARTIAL, new PartialRankBolt(3), 1)
-                .allGrouping(COUNT_BY_H);
+                .allGrouping(COUNT_BY_D);
 
         builder.setBolt(GLOBAL, new GlobalRankBolt(true, 3, TOPIC_1_OUTPUT), 1)
                 .allGrouping(PARTIAL);
