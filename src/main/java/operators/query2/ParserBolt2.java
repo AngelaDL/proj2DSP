@@ -53,7 +53,7 @@ public class ParserBolt2 extends BaseRichBolt {
         if(comment_type.equals("comment")) {
             //System.out.println("COMMENT TYPE: " + comment_type);
             Values values = new Values(Long.parseLong(create_date)*1000, comment_type, currentTimestamp);
-            System.out.println("VALUES QUERY 2: " + values);
+            //System.out.println("VALUES QUERY 2: " + values);
             _collector.emit(values);
         }
         _collector.ack(tuple);

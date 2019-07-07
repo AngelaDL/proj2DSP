@@ -30,9 +30,9 @@ public class SlotBasedWindow {
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTimeZone(TimeZone.getTimeZone("GMT+1"));
         calendar.setTimeInMillis(timestamp);
-        System.out.println("Current time is: " + calendar.getTime());
+        //System.out.println("Current time is: " + calendar.getTime());
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        System.out.println("HOUR: " + hour);
+        //System.out.println("HOUR: " + hour);
 
         return hour/2;
     }

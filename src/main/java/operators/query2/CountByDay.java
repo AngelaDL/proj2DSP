@@ -14,6 +14,7 @@ import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Tuple;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Properties;
 
@@ -23,7 +24,7 @@ public class CountByDay extends BaseRichBolt {
 
     private OutputCollector _collector;
     private SlotBasedWindow window;
-    private int current;
+    //private int current;
     private long lastTick;
     private KafkaProducer<String, String> producer;
 
@@ -31,7 +32,8 @@ public class CountByDay extends BaseRichBolt {
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         this._collector = outputCollector;
         this.window = new SlotBasedWindow();
-        this.current = 0;
+        this.lastTick = 0;
+        //this.current = 0;
 
         Properties properties = new Properties();
         properties.put("bootstrap.servers", KAFKA_IP_PORT);
@@ -46,27 +48,34 @@ public class CountByDay extends BaseRichBolt {
 
         String msgType = tuple.getSourceStreamId();
 
+
         // When a tick by metronome is received, it handles the window shifting operations
         if (msgType.equals(METRONOME_D_STREAM_ID)) {
             long tupleTimestamp = tuple.getLongByField(CREATE_DATE);
             long timestamp = tuple.getLongByField(CURRENT_TIMESTAMP);
+            System.err.println("TICK: " + msgType);
+
 
 
             //quando mi arriva il tick di un giorno dal metronomo, posso produrre i risultati
             if(tupleTimestamp > this.lastTick) {
                 //calcolo quanto tempo è trascorso
-                int elapsedHour = (int) Math.ceil((tupleTimestamp - lastTick) / MetronomeBolt.MILLIS_D);
+                System.out.println("tupletimestamp: " + tupleTimestamp);
+                System.out.println("lastTick: " + lastTick);
+                int elapsedDay = (int) Math.ceil((tupleTimestamp - lastTick) / MetronomeBolt.MILLIS_D);
                 long[] windowSize = window.getTimeframes();
 
                 String window = "";
                 for(int i = 0; i < windowSize.length; i ++) {
                     window += windowSize[i] + " ";
                 }
-                System.out.println("RESULT: " + window);
+                System.err.println("RESULT: " + window);
                 producer.send(new ProducerRecord<String, String>(TOPIC_2_OUTPUT, window));
 
                 // Avanzo la finestra
-                this.window.moveForward(elapsedHour);
+                this.window = new SlotBasedWindow();
+                //this.window.moveForward(elapsedDay);
+
                 // Aggiorno il timestamp
                 this.lastTick = tupleTimestamp;
             }

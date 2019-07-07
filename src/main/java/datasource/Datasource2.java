@@ -20,7 +20,7 @@ public class Datasource2 implements Runnable {
 
     public Datasource2() {
 
-        this.producer =  new SimpleKakfaProducer(TOPIC_1_INPUT);
+        this.producer =  new SimpleKakfaProducer(TOPIC_2_INPUT);
 
     }
 
