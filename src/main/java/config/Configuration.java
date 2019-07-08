@@ -43,4 +43,11 @@ public class Configuration {
     public static final String ESTIMATED_TOTAL = "estimated_total";
     public static final String PARTIAL_RANKING = "partial_ranking";
     public static final String COMMENT_TYPE = "comment_type";
+    public static final String USER_ID = "user_id";
+    public static final String COMMENT_ID = "comment_id";
+    public static final String DEPTH = "depth";
+    public static final String EDITOR_SELECTION = "editor_selection";
+    public static final String IN_REPLY_TO = "in_reply_to";
+    public static final String PARENT_USER_NAME = "parent_user_name";
+    public static final String RECCOMENDATIONS = "reccomendations";
 }
