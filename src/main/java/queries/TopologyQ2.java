@@ -3,10 +3,7 @@ package main.java.queries;
 import main.java.operators.MetronomeBolt;
 import main.java.operators.SamplingBolt;
 import main.java.operators.query1.KafkaSpout;
-import main.java.operators.query2.CountByDay;
-import main.java.operators.query2.CountByWeek;
-import main.java.operators.query2.KafkaSpout2;
-import main.java.operators.query2.ParserBolt2;
+import main.java.operators.query2.*;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
 import org.apache.storm.topology.TopologyBuilder;
@@ -19,6 +16,7 @@ public class TopologyQ2 {
     private static final String PARSER2 = "parser2";
     private static final String COUNT_BY_DAY = "count_by_day";
     private static final String COUNT_BY_WEEK = "count_by_week";
+    private static final String COUNT_BY_MONTH = "count_by_month";
     private static final String SAMPLING = "sampling";
     private static final String METRONOME = "metronome";
 
@@ -37,18 +35,22 @@ public class TopologyQ2 {
         builder.setBolt(METRONOME, new MetronomeBolt(), 1)
                 .allGrouping(SAMPLING);
 
+        builder.setBolt(COUNT_BY_DAY, new CountByDay(), 1)
+                .shuffleGrouping(PARSER2)
+                .allGrouping(METRONOME, METRONOME_D_STREAM_ID);
+
         builder.setBolt(COUNT_BY_WEEK, new CountByWeek(), 1)
                 .shuffleGrouping(PARSER2)
                 .allGrouping(METRONOME, METRONOME_D_STREAM_ID);
 
-        //builder.setBolt(COUNT_BY_DAY, new CountByDay(), 1)
-        //        .shuffleGrouping(PARSER2)
-        //        .allGrouping(METRONOME, METRONOME_D_STREAM_ID);
+        builder.setBolt(COUNT_BY_MONTH, new CountByMonth(), 1)
+                .shuffleGrouping(PARSER2)
+                .allGrouping(METRONOME, METRONOME_D_STREAM_ID);
 
         Config conf = new Config();
         LocalCluster localCluster = new LocalCluster();
         try {
-            KAFKA_IP_PORT = "localhost:9092";
+            KAFKA_PORT = "localhost:9092";
             conf.setNumWorkers(3);
         } catch (Exception e) {
             System.err.println("You have to specify kafka host and the number of the workers");

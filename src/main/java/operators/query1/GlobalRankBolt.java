@@ -40,7 +40,7 @@ public class GlobalRankBolt extends BaseRichBolt {
 
         if (this.USE_KAFKA) {
             Properties props = new Properties();
-            props.put("bootstrap.servers", KAFKA_IP_PORT);
+            props.put("bootstrap.servers", KAFKA_PORT);
             props.put("key.serializer", StringSerializer.class);
             props.put("value.serializer", StringSerializer.class);
 

@@ -36,7 +36,7 @@ public class CountByDay extends BaseRichBolt {
         //this.current = 0;
 
         Properties properties = new Properties();
-        properties.put("bootstrap.servers", KAFKA_IP_PORT);
+        properties.put("bootstrap.servers", KAFKA_PORT);
         properties.put("key.serializer", StringSerializer.class);
         properties.put("value.serializer", StringSerializer.class);
         this.producer = new KafkaProducer<String, String>(properties);

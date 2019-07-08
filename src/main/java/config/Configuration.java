@@ -15,7 +15,7 @@ public class Configuration {
                     KAFKA_BROKER_1 + SEP +
                     KAFKA_BROKER_2;
 
-    public static String KAFKA_IP_PORT = "localhost:9092";
+    public static String KAFKA_PORT = "localhost:9092";
     public static final String TOPIC_1_INPUT = "query-1-input";
     public static final String TOPIC_2_INPUT = "query-2-input";
     public static final String TOPIC_3_INPUT = "query-3-input";
@@ -33,12 +33,10 @@ public class Configuration {
     public static final double PERCENT = 0.1;
 
     // Data fields
-    public static final String TIMESTAMP = "timestamp";
     public static final String RAW_DATA = "rawdata";
     public static final String CURRENT_TIMESTAMP = "current";
     public static final String CREATE_DATE = "create_date";
     public static final String ARTICLE_ID = "article_id";
-    //public static final String[] PARSER_QUERY_1 = {"create_date", "article_id"};
     public static final String METRONOME_H_STREAM_ID = "h_msg";
     public static final String METRONOME_D_STREAM_ID = "d_msg";
     public static final String PARSER_STREAM_ID = "parser";

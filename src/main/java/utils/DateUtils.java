@@ -51,4 +51,15 @@ public class DateUtils {
         }
         return result;
     }
+
+    public static int getDayOfMonth(long timestamp) {
+        Calendar calendar = GregorianCalendar.getInstance();
+        calendar.setTimeZone(TimeZone.getTimeZone("GMT+1"));
+        calendar.setTimeInMillis(timestamp);
+        //System.out.println("Current time is: " + calendar.getTime());
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        //System.out.println("HOUR: " + hour);
+
+        return day;
+    }
 }

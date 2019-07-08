@@ -49,7 +49,7 @@ public class TopologyQ1 {
         Config conf = new Config();
         LocalCluster localCluster = new LocalCluster();
         try {
-            KAFKA_IP_PORT = "localhost:9092";
+            KAFKA_PORT = "localhost:9092";
             int stormWorkers = 3;
             conf.setNumWorkers(stormWorkers);
         } catch (Exception e) {
