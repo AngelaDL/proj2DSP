@@ -56,62 +56,19 @@ public class ParserBolt extends BaseRichBolt {
         //for(int i = 0; i<splitted.length; i++)
         //    System.out.println("SPLITTED: " + i + " " + splitted[i]);
 
-        String timestamp = splitted[5];
+        String tupleTimestamp = splitted[5];
+        String comment_type = splitted[4];
         String article_id = splitted[1];
-        //System.err.println("TIMESTAMP: " + timestamp);
-        //if (validateTuple(splitted)) {
 
-        Values values = new Values(Long.parseLong(timestamp) * 1000, article_id, currentTimestamp);
-        //values.add(splitted[1]);
-        //values.add(splitted[5]);
-        //values.add(currentTimestamp);
-
-        //System.out.println("PARSER VALUES: " +  values);
-
-        _collector.emit(values);
-        //}
+        if(comment_type != null) {
+            Values values = new Values(Long.parseLong(tupleTimestamp) * 1000, article_id, currentTimestamp);
+            _collector.emit(values);
+        }
         _collector.ack(tuple);
     }
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
         outputFieldsDeclarer.declare(new Fields(CREATE_DATE, ARTICLE_ID, CURRENT_TIMESTAMP));
-    }
-
-    private boolean validateTuple(String[] fields) {
-        if (fields.length < 15)
-            return false;
-
-        if (!ValidityControl.timestamp(fields[0]) || !ValidityControl.timestamp(fields[5]))
-            return false;
-
-        if (!ValidityControl.unsignedInteger(fields[3]) ||
-            !ValidityControl.unsignedInteger(fields[2]) ||
-            !ValidityControl.unsignedInteger(fields[13]))
-            return false;
-
-        if (!ValidityControl.commentType(fields[4]))
-            return false;
-
-        if (!ValidityControl.depth(fields[6]))
-            return false;
-
-        if (!ValidityControl.isBool(fields[7]))
-            return false;
-
-        if (!ValidityControl.reply(fields[8]))
-            return false;
-
-        if (!ValidityControl.isInteger(fields[10]))
-            return false;
-
-        if (!ValidityControl.isNullOrEmpty(fields[1]) ||
-                !ValidityControl.isNullOrEmpty(fields[9]) ||
-                !ValidityControl.isNullOrEmpty(fields[11]) ||
-                !ValidityControl.isNullOrEmpty(fields[12]) ||
-                !ValidityControl.isNullOrEmpty(fields[14]))
-            return false;
-
-        return true;
     }
 }

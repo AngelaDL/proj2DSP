@@ -28,7 +28,7 @@ public class KafkaSpout extends BaseRichSpout {
         this._collector = spoutOutputCollector;
 
         Properties properties = new Properties();
-        properties.put("bootstrap.servers", BOOTSTRAP_SERVERS);
+        properties.put("bootstrap.servers", KAFKA_PORT);
         properties.put("group.id", GLOBAL_GROUP_ID);
         properties.put("enable.auto.commit", "true");
         properties.put("key.deserializer", StringDeserializer.class);

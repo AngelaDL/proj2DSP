@@ -8,8 +8,8 @@ import java.util.List;
 public class TopKRanking {
 
 	private Comparator<RankItem> comparator = null;
-	private List<RankItem> ranking = null;
-	private int topK = 10;
+	private ArrayList<RankItem> ranking = null;
+	private int topK;
 
 	private static final int NOT_PRESENT = -1;
 
@@ -62,7 +62,6 @@ public class TopKRanking {
 		ranking.add((insertionPoint > -1) ? insertionPoint : (-insertionPoint) - 1, item);
 		insertionPoint = (insertionPoint > -1) ? insertionPoint : (-insertionPoint) - 1;
 		return insertionPoint;
-
 	}
 	
 	public void remove(RankItem item){
@@ -90,7 +89,7 @@ public class TopKRanking {
 	
 	public Ranking getTopK(){
 		
-		List<RankItem> top = new ArrayList<RankItem>();
+		ArrayList<RankItem> top = new ArrayList<RankItem>();
 		
 		if (ranking.isEmpty()){
 			Ranking topKRanking = new Ranking();

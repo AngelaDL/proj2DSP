@@ -1,6 +1,7 @@
 package main.java.utils;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class RankItem implements Serializable {
 
@@ -41,15 +42,17 @@ public class RankItem implements Serializable {
 			return false;
 		
 		RankItem other = (RankItem) obj;
+		return Objects.equals(this.articleID, other.articleID);
 		
-		if (this.articleID.equals(other.articleID))
+		/*if (this.articleID.equals(other.articleID))
 			return true;
 		
-		return false;
+		return false; */
 	}
 	
 	@Override
 	public String toString() {
-		return articleID + ":" + String.valueOf(popularity);
+		return  this.getArticleID().concat(", ").concat(String.valueOf(popularity));
+		/*return articleID + ":" + String.valueOf(popularity); */
 	}
 }

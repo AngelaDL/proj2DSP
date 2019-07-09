@@ -1,5 +1,6 @@
 package main.java.operators.query1;
 
+import main.java.utils.DateUtils;
 import main.java.utils.RankItem;
 import main.java.utils.Ranking;
 import main.java.utils.TopKRanking;
@@ -12,6 +13,7 @@ import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Tuple;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -24,36 +26,37 @@ public class GlobalRankBolt extends BaseRichBolt {
     private KafkaProducer<String, String> producer;
     private TopKRanking topKranking;
     private int k;
-    private boolean USE_KAFKA;
+    //private boolean USE_KAFKA;
     private String kafkaTopic;
 
     public GlobalRankBolt(boolean USE_KAFKA, int k, String kafkaTopic) {
-        this.USE_KAFKA = USE_KAFKA;
+        //this.USE_KAFKA = USE_KAFKA;
         this.k = k;
         this.kafkaTopic = kafkaTopic;
     }
 
     @Override
-    public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
+    public void prepare(@SuppressWarnings("rawtypes")Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         this._collector = outputCollector;
         this.topKranking = new TopKRanking(k);
 
-        if (this.USE_KAFKA) {
+        //if (this.USE_KAFKA) {
             Properties props = new Properties();
             props.put("bootstrap.servers", KAFKA_PORT);
             props.put("key.serializer", StringSerializer.class);
             props.put("value.serializer", StringSerializer.class);
 
             producer = new KafkaProducer<String, String>(props);
-        }
+        //}
     }
 
     @Override
     public void execute(Tuple tuple) {
+
         boolean updated = false;
         long tupleTimestamp = tuple.getLongByField(CREATE_DATE);
         long currentTimestamp = tuple.getLongByField(CURRENT_TIMESTAMP);
-        //String metronomeMsg = tuple.getStringByField(METRONOME_H_STREAM_ID);
+        String metronomeMsg = tuple.getStringByField(TIME_ID);
         //String articleID = tuple.getStringByField(PARSER_QUERY_1[1]);
         //long estimatedTotal = tuple.getLongByField(ESTIMATED_TOTAL);
 
@@ -61,7 +64,7 @@ public class GlobalRankBolt extends BaseRichBolt {
 
         for (RankItem item : partialRanking.getRanking()) {
             updated |= topKranking.update(item);
-            System.out.println(updated);
+            //System.out.println(updated);
         }
 
         if (updated) {
@@ -74,24 +77,42 @@ public class GlobalRankBolt extends BaseRichBolt {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        // I don't need to declare fields, cuz this is the final bolt :B
-        //outputFieldsDeclarer.declare(new Fields("END"));
+
     }
 
     private void createOutputResponse(long currentTimestamp, long tupleTimestamp) {
-        String result = tupleTimestamp + ", ";
-        List<RankItem> globalRanking = this.topKranking.getTopK().getRanking();
 
+        Date date = DateUtils.getDate(tupleTimestamp);
+        List<RankItem> globalRanking = topKranking.getTopK().getRanking();
 
-        String[] results = new String[globalRanking.size()];
+        //String result = tupleTimestamp + ", ";
+        String result = "";
+        result = result.concat(String.valueOf(date));
 
-        for (int i=0; i< globalRanking.size(); i++) {
+        for(int i = 0; i < globalRanking.size(); i++) {
+            RankItem item = globalRanking.get(i);
+            result = result + ", " + item.getArticleID() + ", " + item.getPopularity();
+        }
+
+        System.err.println("RESULT: " + result);
+
+        if(globalRanking.size() < k){
+            int i = k - globalRanking.size();
+            for(int j = 0; j < i; j++){
+                result += "NULL";
+                result += ", ";
+            }
+        }
+
+        //String[] results = new String[globalRanking.size()];
+
+        /*for (int i=0; i< globalRanking.size(); i++) {
             results[i] = globalRanking.get(i).getArticleID() + ", " + globalRanking.get(i).getPopularity();
             //result += globalRanking.get(i).getArticleID() + ", " + globalRanking.get(i).getPopularity();
         }
 
         for (int j=0; j<results.length; j++)
-            System.out.println("--> " + results[j]);
+            System.out.println("--> " + results[j]); */
 
         producer.send(new ProducerRecord<String, String>(this.kafkaTopic, result));
     }

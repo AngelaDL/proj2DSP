@@ -10,7 +10,7 @@ public class RankItemComparator implements Comparator<RankItem> {
 		Long count1 = r1.getPopularity();
 		Long count2 = r2.getPopularity();
 
-		return -count1.compareTo(count2); //rank in descending order
+		return -count1.compareTo(count2);
 	}
 
 }

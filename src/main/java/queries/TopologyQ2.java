@@ -35,17 +35,17 @@ public class TopologyQ2 {
         builder.setBolt(METRONOME, new MetronomeBolt(), 1)
                 .allGrouping(SAMPLING);
 
-        builder.setBolt(COUNT_BY_DAY, new CountByDay(), 1)
+        /*builder.setBolt(COUNT_BY_DAY, new CountByDay(), 1)
                 .shuffleGrouping(PARSER2)
-                .allGrouping(METRONOME, METRONOME_D_STREAM_ID);
+                .allGrouping(METRONOME, METRONOME_D_STREAM_ID);*/
 
         builder.setBolt(COUNT_BY_WEEK, new CountByWeek(), 1)
                 .shuffleGrouping(PARSER2)
                 .allGrouping(METRONOME, METRONOME_D_STREAM_ID);
 
-        builder.setBolt(COUNT_BY_MONTH, new CountByMonth(), 1)
+        /* builder.setBolt(COUNT_BY_MONTH, new CountByMonth(), 1)
                 .shuffleGrouping(PARSER2)
-                .allGrouping(METRONOME, METRONOME_D_STREAM_ID);
+                .allGrouping(METRONOME, METRONOME_D_STREAM_ID); */
 
         Config conf = new Config();
         LocalCluster localCluster = new LocalCluster();

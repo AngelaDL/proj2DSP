@@ -30,7 +30,7 @@ public class Configuration {
     public static final String DATASET = "/home/angela/IdeaProjects/proj2DSP/data/Comments_jan-apr2018.csv";
 
     // Discard probability for the SamplingBolt
-    public static final double PERCENT = 0.1;
+    public static final double PERCENT = 0.005;
 
     // Data fields
     public static final String RAW_DATA = "rawdata";
@@ -50,4 +50,8 @@ public class Configuration {
     public static final String IN_REPLY_TO = "in_reply_to";
     public static final String PARENT_USER_NAME = "parent_user_name";
     public static final String RECCOMENDATIONS = "reccomendations";
+    public static final String H_ID = "h_id";
+    public static final String D_ID = "d_id";
+    public static final String W_ID = "w_id";
+    public static final String TIME_ID = "time_id";
 }

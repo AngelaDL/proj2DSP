@@ -13,14 +13,14 @@ import static main.java.config.Configuration.*;
 public class Datasource2 implements Runnable {
 
     private static final int TIMESPAN = 1; 		// expressed in mins
-    //private static final int SPEEDUP = 1000; 	// expressed in ms
+    private static final int SPEEDUP = 1000; 	// expressed in ms
     private static int SHORT_SLEEP = 10;		// expressed in ms
 
     private SimpleKakfaProducer producer;
 
     public Datasource2() {
 
-        this.producer =  new SimpleKakfaProducer(TOPIC_2_INPUT);
+        this.producer =  new SimpleKakfaProducer(TOPIC_1_INPUT);
 
     }
 
@@ -43,12 +43,12 @@ public class Datasource2 implements Runnable {
             while ((line = br.readLine()) != null) {
 
                 long nextTime = getEventTime(line);
-                long sleepTime = (int) Math.floor(((double) (nextTime - previousTime ) / (60*1000)));
-                long deltaIntervalToSkip = 1000 - (System.currentTimeMillis() - latestSendingTime);
+                long sleepTime = (int) Math.floor(((double) (nextTime - previousTime ) / (TIMESPAN * 60 * 1000)));
+                long deltaIntervalToSkip = SPEEDUP - (System.currentTimeMillis() - latestSendingTime);
                 //sleepTime = sleepTime + deltaIntervalToSkip;
                 if(sleepTime > 0) {
 
-                    System.out.println(" sleep for :" + sleepTime + " ms");
+                    //System.out.println(" sleep for :" + sleepTime + " ms");
 
                     try {
                         Thread.sleep(sleepTime);

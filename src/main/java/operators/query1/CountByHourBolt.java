@@ -1,6 +1,7 @@
 package main.java.operators.query1;
 
 import main.java.operators.MetronomeBolt;
+import main.java.utils.DateUtils;
 import main.java.utils.Window;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
@@ -29,32 +30,32 @@ public class CountByHourBolt extends BaseRichBolt {
 
     @Override
     public void execute(Tuple tuple) {
+
         String msgType = tuple.getSourceStreamId();
 
         // When a tick by metronome is received, it handles the window shifting operations
         if (msgType.equals(METRONOME_H_STREAM_ID)) {
+
             long tupleTimestamp = tuple.getLongByField(CREATE_DATE);
             long currentTimestamp = tuple.getLongByField(CURRENT_TIMESTAMP);
-            int elapsedHour = (int) Math.ceil((tupleTimestamp - lastTick) / MetronomeBolt.MILLIS_H);
-            System.out.println(msgType);
-            //System.err.println("ELAPSED: " + elapsedHour);
 
-            // Control: only informations relating to the current window are processed
-            for (String articleID : this.map.keySet()) {
-                Window window = this.map.get(articleID);
+            if(tupleTimestamp > this.lastTick) {
+                int elapsedHour = (int) Math.ceil((tupleTimestamp - lastTick) / (1000*60*60));
 
-                Values values = new Values();
-                values.add(tupleTimestamp);
-                values.add(currentTimestamp);
-                values.add(METRONOME_H_STREAM_ID);
-                values.add(articleID);
-                values.add(window.getEstimatedTotal());
+                // Control: only informations relating to the current window are processed
+                for (String articleID : map.keySet()) {
+                    Window window = map.get(articleID);
 
-                _collector.emit(values);
+                    Values values = new Values(tupleTimestamp, currentTimestamp, H_ID, articleID, window.getEstimatedTotal());
+                    //System.err.println(DateUtils.getDate(tupleTimestamp) + " " + values);
 
-                window.moveForward(elapsedHour);
+                    _collector.emit(values);
+
+                    window.moveForward(elapsedHour);
+                }
+                this.lastTick = tupleTimestamp;
             }
-            this.lastTick = tupleTimestamp;
+
         }
 
         // When a msg from parser is received, it handles memorization operations in the window
@@ -62,26 +63,24 @@ public class CountByHourBolt extends BaseRichBolt {
             String articleID = tuple.getStringByField(ARTICLE_ID);
             long timestamp = tuple.getLongByField(CREATE_DATE);
 
-            //System.out.println("COUNT ARTICLE_ID: " + articleID);
-            //System.out.println("COUNT TIMESTAMP: " + timestamp);
-
             // Control: only informations relating to the current window are processed
             if (timestamp > this.lastTick) {
                 // If there isn't the key in the map, create a new <key, value> object
-                Window window = this.map.get(articleID);
+                Window window = map.get(articleID);
                 if (window == null) {
                     window = new Window(1);
-                    map.put(articleID, window); // This is a tumbling window
+                    map.put(articleID, window);
                 }
 
                 //System.out.println("WINDOW: " + window.getEstimatedTotal());
                 window.increment();
             }
         }
+        _collector.ack(tuple);
     }
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields(CREATE_DATE, CURRENT_TIMESTAMP, METRONOME_H_STREAM_ID, ARTICLE_ID, ESTIMATED_TOTAL));
+        outputFieldsDeclarer.declare(new Fields(CREATE_DATE, CURRENT_TIMESTAMP, TIME_ID, ARTICLE_ID, ESTIMATED_TOTAL));
     }
 }

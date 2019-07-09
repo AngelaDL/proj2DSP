@@ -25,17 +25,17 @@ public class PartialRankBolt extends BaseRichBolt {
     }
 
     @Override
-    public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
+    public void prepare(@SuppressWarnings("rawtypes")Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         this._collector = outputCollector;
-        this.topKranking = new TopKRanking(this.k);
+        this.topKranking = new TopKRanking(k);
     }
 
     @Override
     public void execute(Tuple tuple) {
-        long tupleTimestamp = tuple.getLongByField(CREATE_DATE);
-        long currentTimestamp = tuple.getLongByField(CURRENT_TIMESTAMP);
-        String metronomeMsg = tuple.getStringByField(METRONOME_D_STREAM_ID);
+        String metronomeMsg = tuple.getStringByField(TIME_ID);
         String articleID = tuple.getStringByField(ARTICLE_ID);
+        long tupleTimestamp = tuple.getLongByField(CREATE_DATE);
+        Long currentTimestamp = tuple.getLongByField(CURRENT_TIMESTAMP);
         long estimatedTotal = tuple.getLongByField(ESTIMATED_TOTAL);
 
         //System.out.println("PARTIAL RANK BOLT: " + tupleTimestamp + " " + currentTimestamp);
@@ -45,17 +45,9 @@ public class PartialRankBolt extends BaseRichBolt {
 
         if (update) {
             Ranking ranking = topKranking.getTopK();
-
-           // System.out.println("CIAO");
-
             Values values = new Values(tupleTimestamp, currentTimestamp, ranking, metronomeMsg);
-            //values.add(tupleTimestamp);
-            //values.add(currentTimestamp);
-            //values.add(gson.toJson(ranking));
-            //values.add(ranking);
-            //values.add(metronomeMsg);
 
-            //System.err.println("PARTIAL RANK VALUES: " + values);
+            //System.err.println("PARTIAL RANK VALUES: " + DateUtils.getDate(tupleTimestamp) + values);
 
             _collector.emit(values);
         }
@@ -64,6 +56,6 @@ public class PartialRankBolt extends BaseRichBolt {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields(CREATE_DATE, CURRENT_TIMESTAMP, PARTIAL_RANKING, METRONOME_H_STREAM_ID));
+        outputFieldsDeclarer.declare(new Fields(CREATE_DATE, CURRENT_TIMESTAMP, PARTIAL_RANKING, TIME_ID));
     }
 }

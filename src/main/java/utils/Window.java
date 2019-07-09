@@ -2,14 +2,14 @@ package main.java.utils;
 
 public class Window {
 
-	int[] timeframes; 
-	int currentIndex; 
-	int size; 
-	long estimatedTotal;
+	private long[] timeframes;
+	private int currentIndex;
+	private int size;
+	private long estimatedTotal;
 	
 	public Window(int size) {
 		
-		this.timeframes = new int[size];
+		this.timeframes = new long[size];
 		this.size = size; 
 		this.currentIndex = 0;
 		this.estimatedTotal = 0;
@@ -19,12 +19,12 @@ public class Window {
 		
 	}
 
-	public int moveForward(){
+	public long moveForward(){
 
 		/* Free the timeframe that is going to go out of the window */
 		int lastTimeframeIndex = (currentIndex + 1) % size;
 		
-		int value = timeframes[lastTimeframeIndex];
+		long value = timeframes[lastTimeframeIndex];
 		timeframes[lastTimeframeIndex] = 0;
 		
 		estimatedTotal -= value;

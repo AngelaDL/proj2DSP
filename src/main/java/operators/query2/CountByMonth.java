@@ -1,6 +1,7 @@
 package main.java.operators.query2;
 
 import main.java.operators.MetronomeBolt;
+import main.java.utils.DateUtils;
 import main.java.utils.SlotBasedWindowMonth;
 import main.java.utils.SlotBasedWindowWeek;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -12,6 +13,7 @@ import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Tuple;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
 
@@ -44,11 +46,12 @@ public class CountByMonth extends BaseRichBolt {
         if(msgType.equals(METRONOME_D_STREAM_ID)) {
             long tupleTimestamp = tuple.getLongByField(CREATE_DATE);
             long timestamp = tuple.getLongByField(CURRENT_TIMESTAMP);
+            Date date = DateUtils.getDate(tupleTimestamp);
 
             if(tupleTimestamp > this.lastTick) {
                 int elapsedDay = (int) Math.ceil((tupleTimestamp - lastTick) / MetronomeBolt.MILLIS_D);
 
-                System.out.println("window 30 x 12");
+                /*System.out.println("window 30 x 12");
                 for (int i = 0; i < 30; i++) {
                     String s = "";
                     for (int j=0; j<12; j++) {
@@ -56,16 +59,18 @@ public class CountByMonth extends BaseRichBolt {
 
                     }
                     System.out.println(s);
-                }
+                }*/
 
 
                 long[] total = windowMonth.getEstimatedTotal();
 
                 String result = "";
+                result = result.concat(String.valueOf(date));
+                result = result.concat(" [ ");
                 for (int i = 0; i < total.length; i++){
                     result += total[i] + " ";
                 }
-                System.err.println("Result: " + result);
+                System.err.println("Result: " + result + "]");
                 producer.send(new ProducerRecord<>(TOPIC_2_OUTPUT, result));
 
                 // Avanzo la finestra

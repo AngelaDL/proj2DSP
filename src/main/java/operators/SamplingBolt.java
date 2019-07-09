@@ -23,18 +23,22 @@ public class SamplingBolt extends BaseRichBolt {
 
     @Override
     public void execute(Tuple tuple) {
-        if (checkPercentage()) {
-            //String timestamp = tuple.getStringByField(CREATE_DATE);
-            //System.out.println("SAMPLING TIMESTAMP: " + timestamp);
-            long timestamp = tuple.getLongByField(CREATE_DATE);
-            long originalTupleTimestamp = tuple.getLongByField(CURRENT_TIMESTAMP);
+            long tupleTimestamp = tuple.getLongByField(CREATE_DATE);
+            long currentTimestamp = tuple.getLongByField(CURRENT_TIMESTAMP);
+            boolean b = false;
 
-            Values values = new Values();
-            values.add(timestamp);
-            values.add(originalTupleTimestamp);
-            _collector.emit(values);
-            _collector.ack(tuple);
-        }
+            double p = Math.random();
+            if (p > PERCENT) {
+                b = true;
+            }
+
+            if(b) {
+                Values values = new Values();
+                values.add(tupleTimestamp);
+                values.add(currentTimestamp);
+                _collector.emit(values);
+                _collector.ack(tuple);
+            }
     }
 
     @Override
@@ -42,10 +46,10 @@ public class SamplingBolt extends BaseRichBolt {
         outputFieldsDeclarer.declare(new Fields(CREATE_DATE, CURRENT_TIMESTAMP));
     }
 
-    private boolean checkPercentage() {
+    /*private boolean checkPercentage() {
         double p = Math.random();
-        if (p < PERCENT)
-            return false;
-        return true;
-    }
+        if (p > PERCENT)
+            return true;
+        return false;
+    }*/
 }

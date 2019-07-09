@@ -2,6 +2,7 @@ package main.java.operators.query2;
 
 import main.java.config.Configuration;
 import main.java.operators.MetronomeBolt;
+import main.java.utils.DateUtils;
 import main.java.utils.SlotBasedWindow;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -15,6 +16,7 @@ import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Tuple;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
 
@@ -53,24 +55,22 @@ public class CountByDay extends BaseRichBolt {
         if (msgType.equals(METRONOME_D_STREAM_ID)) {
             long tupleTimestamp = tuple.getLongByField(CREATE_DATE);
             long timestamp = tuple.getLongByField(CURRENT_TIMESTAMP);
+            Date date = DateUtils.getDate(tupleTimestamp);
             System.err.println("TICK: " + msgType);
-
-
 
             //quando mi arriva il tick di un giorno dal metronomo, posso produrre i risultati
             if(tupleTimestamp > this.lastTick) {
                 //calcolo quanto tempo è trascorso
-                System.out.println("tupletimestamp: " + tupleTimestamp);
-                System.out.println("lastTick: " + lastTick);
                 int elapsedHour = (int) Math.ceil((tupleTimestamp - lastTick) / (1000*60));
-                System.err.println("ELAPSED: " + elapsedHour);
                 long[] windowSize = window.getTimeframes();
 
                 String result = "";
+                result = result.concat(String.valueOf(date));
+                result = result.concat(" [ ");
                 for(int i = 0; i < windowSize.length; i ++) {
                     result += windowSize[i] + " ";
                 }
-                System.err.println("RESULT: " + result);
+                System.err.println("RESULT: " + result + "]");
                 producer.send(new ProducerRecord<String, String>(TOPIC_2_OUTPUT, result));
 
                 // Avanzo la finestra

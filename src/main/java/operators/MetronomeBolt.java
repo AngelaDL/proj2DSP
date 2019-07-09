@@ -43,7 +43,7 @@ public class MetronomeBolt extends BaseRichBolt {
             Values values = new Values();
             values.add(time);
             values.add(currentTimestamp);
-            System.out.println("E' PASSATA UN ORA");
+            //System.out.println("E' PASSATA UN ORA");
             _collector.emit(METRONOME_H_STREAM_ID, values);
         }
 

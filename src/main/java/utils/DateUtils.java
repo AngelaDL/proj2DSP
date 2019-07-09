@@ -1,6 +1,8 @@
 package main.java.utils;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
@@ -61,5 +63,16 @@ public class DateUtils {
         //System.out.println("HOUR: " + hour);
 
         return day;
+    }
+
+    public static Date getDate(long timestamp) {
+        Calendar calendar = GregorianCalendar.getInstance();
+        calendar.setTimeZone(TimeZone.getTimeZone("GMT+1"));
+        calendar.setTimeInMillis(timestamp);
+        //System.out.println("Current time is: " + calendar.getTime());
+        Date date = calendar.getTime();
+        //System.out.println("HOUR: " + hour);
+
+        return date;
     }
 }

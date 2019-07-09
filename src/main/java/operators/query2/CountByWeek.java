@@ -1,6 +1,7 @@
 package main.java.operators.query2;
 
 import main.java.operators.MetronomeBolt;
+import main.java.utils.DateUtils;
 import main.java.utils.SlotBasedWindowWeek;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -11,6 +12,7 @@ import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Tuple;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
 
@@ -44,13 +46,14 @@ public class CountByWeek extends BaseRichBolt {
             //System.out.println("lo status è: " + status);
             long tupleTimestamp = tuple.getLongByField(CREATE_DATE);
             long timestamp = tuple.getLongByField(CURRENT_TIMESTAMP);
+            Date date = DateUtils.getDate(tupleTimestamp);
             //System.err.println("TICK: " + msgType);
 
             if(tupleTimestamp > this.lastTick) {
                 int elapsedDay = (int) Math.ceil((tupleTimestamp - lastTick) / MetronomeBolt.MILLIS_D);
                 System.out.println("ELAPSED: " + elapsedDay);
 
-                System.out.println("window 7 x 12");
+                /* System.out.println("window 7 x 12");
                 for (int i = 0; i < 7; i++) {
                     String s = "";
                     for (int j=0; j<12; j++) {
@@ -58,23 +61,20 @@ public class CountByWeek extends BaseRichBolt {
 
                     }
                     System.out.println(s);
-                }
+                }*/
 
 
                 long[] total = windowWeek.getEstimatedTotal();
 
-                //if(this.status == 6){
-                    String result = "";
-                    for (int i = 0; i < total.length; i++){
-                        result += total[i] + " ";
-                    }
-                    System.err.println("Result: " + result);
-                    producer.send(new ProducerRecord<>(TOPIC_2_OUTPUT, result));
-                    //this.status = 0;
 
-                //}
-
-                //this.status++;
+                String result = "";
+                result = result.concat(String.valueOf(date));
+                result = result.concat(" [ ");
+                for (int i = 0; i < total.length; i++){
+                    result += total[i] + " ";
+                }
+                System.err.println("Result: " + result + "]");
+                producer.send(new ProducerRecord<>(TOPIC_2_OUTPUT, result));
 
                 // Avanzo la finestra
                 //this.windowWeek = new SlotBasedWindowWeek();

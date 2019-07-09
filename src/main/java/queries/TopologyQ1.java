@@ -6,6 +6,7 @@ import main.java.operators.query1.*;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
 import org.apache.storm.topology.TopologyBuilder;
+import org.apache.storm.tuple.Fields;
 
 import static main.java.config.Configuration.*;
 
@@ -17,8 +18,13 @@ public class TopologyQ1 {
     private static final String METRONOME = "metronome";
     private static final String COUNT_BY_H = "countByH";
     private static final String COUNT_BY_D = "countByD";
-    private static final String PARTIAL = "partial";
-    private static final String GLOBAL = "global";
+    private static final String COUNT_BY_W = "countByW";
+    private static final String PARTIAL_H = "partial_h";
+    private static final String PARTIAL_D = "partial_d";
+    private static final String PARTIAL_W = "partial_w";
+    private static final String GLOBAL_H = "global_h";
+    private static final String GLOBAL_D = "global_d";
+    private static final String GLOBAL_W = "global_w";
 
 
     public static void main(String[] args) throws Exception {
@@ -28,7 +34,7 @@ public class TopologyQ1 {
         builder.setSpout(SPOUT, new KafkaSpout(), 1);
 
         builder.setBolt(PARSER, new ParserBolt(), 1)
-                .localOrShuffleGrouping(SPOUT);
+                .shuffleGrouping(SPOUT);
 
         builder.setBolt(SAMPLING, new SamplingBolt(), 1)
                 .allGrouping(PARSER);
@@ -36,22 +42,25 @@ public class TopologyQ1 {
         builder.setBolt(METRONOME, new MetronomeBolt(), 1)
                 .allGrouping(SAMPLING);
 
-        builder.setBolt(COUNT_BY_D, new CountByDayBolt(), 1)
+        builder.setBolt(COUNT_BY_H, new CountByHourBolt(), 1)
+                .fieldsGrouping(PARSER, new Fields(ARTICLE_ID))
+                .allGrouping(METRONOME, METRONOME_H_STREAM_ID);
+
+        builder.setBolt(PARTIAL_H, new PartialRankBolt(3), 1)
+                .fieldsGrouping(COUNT_BY_H, new Fields(ARTICLE_ID));
+
+        builder.setBolt(GLOBAL_H, new GlobalRankBolt(true, 3, TOPIC_1_OUTPUT), 1)
+                .allGrouping(PARTIAL_H);
+
+        /* builder.setBolt(COUNT_BY_D, new CountByDayBolt(), 1)
                 .allGrouping(PARSER)
-                .allGrouping(METRONOME, METRONOME_D_STREAM_ID);
-
-        builder.setBolt(PARTIAL, new PartialRankBolt(3), 1)
-                .allGrouping(COUNT_BY_D);
-
-        builder.setBolt(GLOBAL, new GlobalRankBolt(true, 3, TOPIC_1_OUTPUT), 1)
-                .allGrouping(PARTIAL);
+                .allGrouping(METRONOME, METRONOME_D_STREAM_ID);*/
 
         Config conf = new Config();
         LocalCluster localCluster = new LocalCluster();
         try {
             KAFKA_PORT = "localhost:9092";
-            int stormWorkers = 3;
-            conf.setNumWorkers(stormWorkers);
+            conf.setNumWorkers(3);
         } catch (Exception e) {
             System.err.println("You have to specify kafka host and the number of the workers");
             e.printStackTrace();

@@ -12,7 +12,7 @@ public class Datasource {
 
     public static void main(String[] args) {
 
-        SimpleKakfaProducer producer = new SimpleKakfaProducer(Configuration.TOPIC_2_INPUT);
+        SimpleKakfaProducer producer = new SimpleKakfaProducer(Configuration.TOPIC_1_INPUT);
 
         BufferedReader br = null;
         String line = "";
