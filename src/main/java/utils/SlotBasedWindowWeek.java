@@ -21,6 +21,10 @@ public class SlotBasedWindowWeek {
         }
     }
 
+    public void setIndex(long ts) {
+        this.currentIndex = DateUtils.getDay(ts);
+    }
+
     public void updateSlot (long timestamp) {
         int i = DateUtils.getSlot(timestamp);
         int day = DateUtils.getDay(timestamp);

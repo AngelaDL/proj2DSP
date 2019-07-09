@@ -23,13 +23,22 @@ public class CountByWeek extends BaseRichBolt {
     private SlotBasedWindowWeek windowWeek;
     private long lastTick;
     private KafkaProducer<String, String> producer;
-    //private int status = 0;
+
+    private int stat;
+    private long currentTime;
+    private long responseTime;
+    private long nResponseTime;
 
     @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         this._collector = outputCollector;
         this.windowWeek = new SlotBasedWindowWeek();
         this.lastTick = 0;
+
+        this.stat = 0;
+        this.currentTime = 0;
+        this.responseTime = 0;
+        this.nResponseTime = 0;
 
         Properties properties = new Properties();
         properties.put("bootstrap.servers", KAFKA_PORT);
@@ -40,14 +49,20 @@ public class CountByWeek extends BaseRichBolt {
 
     @Override
     public void execute(Tuple tuple) {
+
+        this.stat += 1;
+
         String msgType = tuple.getSourceStreamId();
 
         if(msgType.equals(METRONOME_D_STREAM_ID)) {
-            //System.out.println("lo status è: " + status);
             long tupleTimestamp = tuple.getLongByField(CREATE_DATE);
             long timestamp = tuple.getLongByField(CURRENT_TIMESTAMP);
             Date date = DateUtils.getDate(tupleTimestamp);
-            //System.err.println("TICK: " + msgType);
+
+            if(this.stat == 1) {
+                windowWeek.setIndex(tupleTimestamp);
+                this.currentTime = System.currentTimeMillis();
+            }
 
             if(tupleTimestamp > this.lastTick) {
                 int elapsedDay = (int) Math.ceil((tupleTimestamp - lastTick) / MetronomeBolt.MILLIS_D);
@@ -84,12 +99,45 @@ public class CountByWeek extends BaseRichBolt {
                 this.lastTick = tupleTimestamp;
 
             }
+            this.stat += 1;
+            long ts = tuple.getLongByField(CREATE_DATE);
+            updateMetrics(ts);
         }
 
         else {
             long tupleTimestamp = tuple.getLongByField(CREATE_DATE);
-            windowWeek.updateSlot(tupleTimestamp);
+
+            if(this.stat == 1) {
+                windowWeek.setIndex(tupleTimestamp);
+                this.currentTime = System.currentTimeMillis();
+            }
+            if(tupleTimestamp > this.lastTick) {
+                windowWeek.updateSlot(tupleTimestamp);
+            }
+            long ts = System.currentTimeMillis() - tuple.getLongByField(CURRENT_TIMESTAMP);
+            responseTime += ts;
+            nResponseTime++;
+
         }
+    }
+
+    public void updateMetrics(long timestamp) {
+        double res = (double) 100 / (double) (System.currentTimeMillis() - currentTime);
+
+        this.currentTime = System.currentTimeMillis();
+
+        this.stat = 0;
+
+        System.out.println("Throughput Week query 2: " + res);
+
+        if(nResponseTime == 0) {
+            nResponseTime = 1;
+        }
+        double avgResponseTime = (double) responseTime / (double) nResponseTime;
+        responseTime = 0;
+        nResponseTime = 0;
+
+        System.out.println("Response Time Week query 2" + avgResponseTime);
     }
 
     @Override

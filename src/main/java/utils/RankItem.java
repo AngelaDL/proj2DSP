@@ -8,18 +8,14 @@ public class RankItem implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private String articleID;
-	private long popularity;
+	private Long popularity;
 	
-	public RankItem() {
-	}
-	
-	public RankItem(String articleID, long popularity) {
-		super();
+	public RankItem(String articleID, Long popularity) {
 		this.articleID = articleID;
 		this.popularity = popularity;
 	}
 
-	public long getPopularity() {
+	public Long getPopularity() {
 		return popularity;
 	}
 
@@ -31,8 +27,8 @@ public class RankItem implements Serializable {
 		return articleID;
 	}
 
-	public void setArticleID(String route) {
-		this.articleID = route;
+	public void setArticleID(String id) {
+		this.articleID = id;
 	}
 
 	@Override
@@ -43,16 +39,11 @@ public class RankItem implements Serializable {
 		
 		RankItem other = (RankItem) obj;
 		return Objects.equals(this.articleID, other.articleID);
-		
-		/*if (this.articleID.equals(other.articleID))
-			return true;
-		
-		return false; */
 	}
 	
 	@Override
 	public String toString() {
-		return  this.getArticleID().concat(", ").concat(String.valueOf(popularity));
-		/*return articleID + ":" + String.valueOf(popularity); */
+		//return  this.getArticleID().concat(", ").concat(this.getPopularity().toString());
+		return articleID + ":" + String.valueOf(popularity);
 	}
 }

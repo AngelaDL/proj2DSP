@@ -1,5 +1,6 @@
 package main.java.operators.query1;
 
+import main.java.utils.DateUtils;
 import main.java.utils.RankItem;
 import main.java.utils.Ranking;
 import main.java.utils.TopKRanking;
@@ -17,17 +18,17 @@ import static main.java.config.Configuration.*;
 
 public class PartialRankBolt extends BaseRichBolt {
     private OutputCollector _collector;
-    private TopKRanking topKranking;
-    private int k;
+    private TopKRanking ranking;
+    private int topK;
 
     public PartialRankBolt(int k) {
-        this.k = k;
+        this.topK = k;
     }
 
     @Override
     public void prepare(@SuppressWarnings("rawtypes")Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         this._collector = outputCollector;
-        this.topKranking = new TopKRanking(k);
+        this.ranking = new TopKRanking(topK);
     }
 
     @Override
@@ -38,14 +39,17 @@ public class PartialRankBolt extends BaseRichBolt {
         Long currentTimestamp = tuple.getLongByField(CURRENT_TIMESTAMP);
         long estimatedTotal = tuple.getLongByField(ESTIMATED_TOTAL);
 
-        //System.out.println("PARTIAL RANK BOLT: " + tupleTimestamp + " " + currentTimestamp);
-        boolean update = false;
-        RankItem item = new RankItem(articleID, estimatedTotal);
-        update = topKranking.update(item);
+        //System.out.println("CREATE_DATE_PARTIAL: " + DateUtils.getDate(tupleTimestamp));
 
-        if (update) {
-            Ranking ranking = topKranking.getTopK();
-            Values values = new Values(tupleTimestamp, currentTimestamp, ranking, metronomeMsg);
+        //System.out.println("PARTIAL RANK BOLT: " + DateUtils.getDate(tupleTimestamp));
+        //boolean update = ranking;
+        RankItem item = new RankItem(articleID, estimatedTotal);
+        //System.out.println("RANK ITEM: " + DateUtils.getDate(tupleTimestamp) + " " + item);
+        boolean updated = ranking.update(item);
+
+        if (updated) {
+            Ranking topK = ranking.getTopK();
+            Values values = new Values(tupleTimestamp, currentTimestamp, topK, metronomeMsg);
 
             //System.err.println("PARTIAL RANK VALUES: " + DateUtils.getDate(tupleTimestamp) + values);
 

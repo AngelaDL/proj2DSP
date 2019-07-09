@@ -26,11 +26,21 @@ public class CountByMonth extends BaseRichBolt {
     private long lastTick;
     private KafkaProducer<String, String> producer;
 
+    private int stat;
+    private long currentTime;
+    private long responseTime;
+    private long nResponseTime;
+
     @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         this._collector = outputCollector;
         this.windowMonth = new SlotBasedWindowMonth();
         this.lastTick = 0;
+
+        this.stat = 0;
+        this.currentTime = 0;
+        this.responseTime = 0;
+        this.nResponseTime = 0;
 
         Properties properties = new Properties();
         properties.put("bootstrap.servers", KAFKA_PORT);
@@ -41,12 +51,20 @@ public class CountByMonth extends BaseRichBolt {
 
     @Override
     public void execute(Tuple tuple) {
+
+        this.stat += 1;
+
         String msgType = tuple.getSourceStreamId();
 
         if(msgType.equals(METRONOME_D_STREAM_ID)) {
             long tupleTimestamp = tuple.getLongByField(CREATE_DATE);
             long timestamp = tuple.getLongByField(CURRENT_TIMESTAMP);
             Date date = DateUtils.getDate(tupleTimestamp);
+
+            if(this.stat == 1) {
+                windowMonth.setIndex(tupleTimestamp);
+                this.currentTime = System.currentTimeMillis();
+            }
 
             if(tupleTimestamp > this.lastTick) {
                 int elapsedDay = (int) Math.ceil((tupleTimestamp - lastTick) / MetronomeBolt.MILLIS_D);
@@ -70,7 +88,7 @@ public class CountByMonth extends BaseRichBolt {
                 for (int i = 0; i < total.length; i++){
                     result += total[i] + " ";
                 }
-                System.err.println("Result: " + result + "]");
+                System.out.println("Result: " + result + "]");
                 producer.send(new ProducerRecord<>(TOPIC_2_OUTPUT, result));
 
                 // Avanzo la finestra
@@ -78,15 +96,44 @@ public class CountByMonth extends BaseRichBolt {
 
                 // Aggiorno il timestamp
                 this.lastTick = tupleTimestamp;
-
             }
+            this.stat += 1;
+            long ts = tuple.getLongByField(CREATE_DATE);
+            updateMetrics(ts);
         }
 
         else {
             long tupleTimestamp = tuple.getLongByField(CREATE_DATE);
-            windowMonth.updateSlot(tupleTimestamp);
+            if(this.stat == 1) {
+                windowMonth.setIndex(tupleTimestamp);
+                this.currentTime = System.currentTimeMillis();
+            }
+            if(tupleTimestamp > this.lastTick) {
+                windowMonth.updateSlot(tupleTimestamp);
+            }
+            long ts = System.currentTimeMillis() - tuple.getLongByField(CURRENT_TIMESTAMP);
+            responseTime += ts;
+            nResponseTime++;
         }
+    }
 
+    public void updateMetrics(long timestamp) {
+        double res = (double) 100 / (double) (System.currentTimeMillis() - currentTime);
+
+        this.currentTime = System.currentTimeMillis();
+
+        this.stat = 0;
+
+        System.out.println("Throughput Week query 2: " + res);
+
+        if(nResponseTime == 0) {
+            nResponseTime = 1;
+        }
+        double avgResponseTime = (double) responseTime / (double) nResponseTime;
+        responseTime = 0;
+        nResponseTime = 0;
+
+        System.out.println("Response Time Week query 2" + avgResponseTime);
     }
 
     @Override

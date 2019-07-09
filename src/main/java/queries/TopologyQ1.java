@@ -49,12 +49,28 @@ public class TopologyQ1 {
         builder.setBolt(PARTIAL_H, new PartialRankBolt(3), 1)
                 .fieldsGrouping(COUNT_BY_H, new Fields(ARTICLE_ID));
 
-        builder.setBolt(GLOBAL_H, new GlobalRankBolt(true, 3, TOPIC_1_OUTPUT), 1)
+        builder.setBolt(GLOBAL_H, new GlobalRankBolt(3))
                 .allGrouping(PARTIAL_H);
 
         /* builder.setBolt(COUNT_BY_D, new CountByDayBolt(), 1)
                 .allGrouping(PARSER)
-                .allGrouping(METRONOME, METRONOME_D_STREAM_ID);*/
+                .allGrouping(METRONOME, METRONOME_D_STREAM_ID);
+
+        builder.setBolt(PARTIAL_D, new PartialRankBolt(3), 1)
+                .fieldsGrouping(COUNT_BY_D, new Fields(ARTICLE_ID));
+
+        builder.setBolt(GLOBAL_D, new GlobalRankBolt(3)
+                .allGrouping(PARTIAL_D);
+
+        /* builder.setBolt(COUNT_BY_W, new CountByWeekBolt(), 1)
+                .fieldsGrouping(PARSER, new Fields(ARTICLE_ID))
+                .allGrouping(METRONOME, METRONOME_D_STREAM_ID);
+
+        builder.setBolt(PARTIAL_W, new PartialRankBolt(3), 1)
+                .fieldsGrouping(COUNT_BY_W, new Fields(ARTICLE_ID));
+
+        builder.setBolt(GLOBAL_W, new GlobalRankBolt(3))
+                .allGrouping(PARTIAL_W); */
 
         Config conf = new Config();
         LocalCluster localCluster = new LocalCluster();
@@ -62,7 +78,6 @@ public class TopologyQ1 {
             KAFKA_PORT = "localhost:9092";
             conf.setNumWorkers(3);
         } catch (Exception e) {
-            System.err.println("You have to specify kafka host and the number of the workers");
             e.printStackTrace();
         }
 

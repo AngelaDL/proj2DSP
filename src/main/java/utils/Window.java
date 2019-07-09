@@ -33,7 +33,6 @@ public class Window {
 		currentIndex = (currentIndex + 1) % size;
 		
 		return value;
-		
 	}	
 
 	public int moveForward(int positions){
@@ -57,7 +56,7 @@ public class Window {
 	
 	public void increment(int value){
 		
-		timeframes[currentIndex]= timeframes[currentIndex] + value;
+		timeframes[currentIndex] = timeframes[currentIndex] + value;
 		
 		estimatedTotal += value;
 		

@@ -2,7 +2,6 @@ package main.java.utils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 
 public class Ranking implements Serializable {
 

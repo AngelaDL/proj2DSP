@@ -50,18 +50,14 @@ public class ParserBolt extends BaseRichBolt {
 
         String rawdata = tuple.getStringByField(RAW_DATA);
         long currentTimestamp = tuple.getLongByField(CURRENT_TIMESTAMP);
-        //System.out.println("RAWDATA: " + rawdata);
-        //System.out.println("TIMESTAMP: " + currentTimestamp);
         String[] splitted = rawdata.split(",");
-        //for(int i = 0; i<splitted.length; i++)
-        //    System.out.println("SPLITTED: " + i + " " + splitted[i]);
 
-        String tupleTimestamp = splitted[5];
+        String create_date = splitted[5];
         String comment_type = splitted[4];
         String article_id = splitted[1];
 
-        if(comment_type != null) {
-            Values values = new Values(Long.parseLong(tupleTimestamp) * 1000, article_id, currentTimestamp);
+        if(comment_type != null && article_id != null) {
+            Values values = new Values(Long.parseLong(create_date)*1000, article_id, currentTimestamp);
             _collector.emit(values);
         }
         _collector.ack(tuple);

@@ -20,6 +20,10 @@ public class SlotBasedWindow {
         this.estimatedTotal = 0;
     }
 
+    public void setIndex(long ts) {
+        this.currentIndex = DateUtils.getSlot(ts);
+    }
+
     public void updateSlot (long timestamp) {
         int i = DateUtils.getSlot(timestamp);
         this.timeframes[i] = timeframes[i] + 1;
