@@ -2,6 +2,7 @@ package main.java.operators.query2;
 
 import main.java.operators.MetronomeBolt;
 import main.java.utils.DateUtils;
+import main.java.utils.FileWriter;
 import main.java.utils.SlotBasedWindowWeek;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -12,6 +13,7 @@ import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Tuple;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
@@ -89,6 +91,12 @@ public class CountByWeek extends BaseRichBolt {
                     result += total[i] + " ";
                 }
                 System.err.println("Result: " + result + "]");
+                FileWriter fw = new FileWriter();
+                try {
+                    fw.writeResult("count_by_w_q2_p3", result);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 producer.send(new ProducerRecord<>(TOPIC_2_OUTPUT, result));
 
                 // Avanzo la finestra
@@ -129,6 +137,12 @@ public class CountByWeek extends BaseRichBolt {
         this.stat = 0;
 
         System.out.println("Throughput Week query 2: " + res);
+        FileWriter fw2 = new FileWriter();
+        try {
+            fw2.writeResult("thr_count_by_w_q2_p3", String.valueOf(res));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         if(nResponseTime == 0) {
             nResponseTime = 1;
@@ -138,6 +152,12 @@ public class CountByWeek extends BaseRichBolt {
         nResponseTime = 0;
 
         System.out.println("Response Time Week query 2" + avgResponseTime);
+        FileWriter fw3 = new FileWriter();
+        try {
+            fw3.writeResult("respT_count_by_w_q2_p3", String.valueOf(avgResponseTime));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

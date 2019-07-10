@@ -2,7 +2,6 @@ package main.java.queries;
 
 import main.java.operators.MetronomeBolt;
 import main.java.operators.SamplingBolt;
-import main.java.operators.query1.KafkaSpout;
 import main.java.operators.query2.*;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
@@ -35,17 +34,17 @@ public class TopologyQ2 {
         builder.setBolt(METRONOME, new MetronomeBolt(), 1)
                 .allGrouping(SAMPLING);
 
-        /*builder.setBolt(COUNT_BY_DAY, new CountByDay(), 1)
-                .shuffleGrouping(PARSER2)
-                .allGrouping(METRONOME, METRONOME_D_STREAM_ID);*/
-
-        builder.setBolt(COUNT_BY_WEEK, new CountByWeek(), 1)
+        builder.setBolt(COUNT_BY_DAY, new CountByDay(), 3)
                 .shuffleGrouping(PARSER2)
                 .allGrouping(METRONOME, METRONOME_D_STREAM_ID);
 
-        /* builder.setBolt(COUNT_BY_MONTH, new CountByMonth(), 1)
+        builder.setBolt(COUNT_BY_WEEK, new CountByWeek(), 3)
                 .shuffleGrouping(PARSER2)
-                .allGrouping(METRONOME, METRONOME_D_STREAM_ID); */
+                .allGrouping(METRONOME, METRONOME_D_STREAM_ID);
+
+        builder.setBolt(COUNT_BY_MONTH, new CountByMonth(), 3)
+                .shuffleGrouping(PARSER2)
+                .allGrouping(METRONOME, METRONOME_D_STREAM_ID);
 
         Config conf = new Config();
         LocalCluster localCluster = new LocalCluster();
@@ -53,7 +52,6 @@ public class TopologyQ2 {
             KAFKA_PORT = "localhost:9092";
             conf.setNumWorkers(3);
         } catch (Exception e) {
-            System.err.println("You have to specify kafka host and the number of the workers");
             e.printStackTrace();
         }
 

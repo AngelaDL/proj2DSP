@@ -33,15 +33,13 @@ public class PartialRankBolt extends BaseRichBolt {
 
     @Override
     public void execute(Tuple tuple) {
-        String metronomeMsg = tuple.getStringByField(TIME_ID);
+        String msgType = tuple.getStringByField(TIME_ID);
         String articleID = tuple.getStringByField(ARTICLE_ID);
         long tupleTimestamp = tuple.getLongByField(CREATE_DATE);
         Long currentTimestamp = tuple.getLongByField(CURRENT_TIMESTAMP);
         long estimatedTotal = tuple.getLongByField(ESTIMATED_TOTAL);
 
         //System.out.println("CREATE_DATE_PARTIAL: " + DateUtils.getDate(tupleTimestamp));
-
-        //System.out.println("PARTIAL RANK BOLT: " + DateUtils.getDate(tupleTimestamp));
         //boolean update = ranking;
         RankItem item = new RankItem(articleID, estimatedTotal);
         //System.out.println("RANK ITEM: " + DateUtils.getDate(tupleTimestamp) + " " + item);
@@ -49,10 +47,13 @@ public class PartialRankBolt extends BaseRichBolt {
 
         if (updated) {
             Ranking topK = ranking.getTopK();
-            Values values = new Values(tupleTimestamp, currentTimestamp, topK, metronomeMsg);
-
+            //System.out.println("TOPK: " + String.valueOf(topK));
+            Values values = new Values();
+            values.add(tupleTimestamp);
+            values.add(currentTimestamp);
+            values.add(topK);
+            values.add(msgType);
             //System.err.println("PARTIAL RANK VALUES: " + DateUtils.getDate(tupleTimestamp) + values);
-
             _collector.emit(values);
         }
         _collector.ack(tuple);

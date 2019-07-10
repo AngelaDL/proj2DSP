@@ -8,7 +8,7 @@ import java.util.List;
 public class TopKRanking {
 
 	private Comparator<RankItem> comparator = null;
-	private ArrayList<RankItem> ranking = null;
+	private List<RankItem> ranking = null;
 	private int topK;
 
 	private static final int NOT_PRESENT = -1;
@@ -89,7 +89,7 @@ public class TopKRanking {
 	
 	public Ranking getTopK(){
 		
-		ArrayList<RankItem> top = new ArrayList<RankItem>();
+		List<RankItem> top = new ArrayList<RankItem>();
 		
 		if (ranking.isEmpty()){
 			Ranking topKRanking = new Ranking();

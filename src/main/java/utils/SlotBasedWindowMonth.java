@@ -4,7 +4,7 @@ public class SlotBasedWindowMonth {
     private long[][] timeframes;
     private int currentIndex;
     private int slot = 12;
-    private int day_month = 30;
+    private int day_month = 32;
     private long[] estimatedTotal;
 
     public SlotBasedWindowMonth() {

@@ -5,8 +5,6 @@ import java.util.Objects;
 
 public class RankItem implements Serializable {
 
-	private static final long serialVersionUID = 1L;
-
 	private String articleID;
 	private Long popularity;
 	
@@ -15,30 +13,26 @@ public class RankItem implements Serializable {
 		this.popularity = popularity;
 	}
 
-	public Long getPopularity() {
-		return popularity;
+	@Override
+	public boolean equals(Object obj) {
+
+		if (obj == null || !(obj instanceof RankItem))
+			return false;
+
+		RankItem other = (RankItem) obj;
+
+        if (this.articleID.equals(other.articleID))
+            return true;
+
+        return false;
 	}
 
-	public void setPopularity(long popularity) {
-		this.popularity = popularity;
+	public Long getPopularity() {
+		return this.popularity;
 	}
 
 	public String getArticleID() {
-		return articleID;
-	}
-
-	public void setArticleID(String id) {
-		this.articleID = id;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-	
-		if (obj == null || !(obj instanceof RankItem))
-			return false;
-		
-		RankItem other = (RankItem) obj;
-		return Objects.equals(this.articleID, other.articleID);
+		return this.articleID;
 	}
 	
 	@Override
