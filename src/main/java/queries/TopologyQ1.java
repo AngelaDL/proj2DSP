@@ -44,7 +44,7 @@ public class TopologyQ1 {
                 .setNumTasks(1)
                 .allGrouping(SAMPLING);
 
-        builder.setBolt(COUNT_BY_H, new CountByHourBolt(), 1)
+        /*builder.setBolt(COUNT_BY_H, new CountByHourBolt(), 1)
                 .fieldsGrouping(PARSER, new Fields(ARTICLE_ID))
                 .allGrouping(METRONOME, METRONOME_H_STREAM_ID);
 
@@ -53,9 +53,9 @@ public class TopologyQ1 {
 
         builder.setBolt(GLOBAL_H, new GlobalRankBolt(3), 1)
                 .setNumTasks(1)
-                .allGrouping(PARTIAL_H);
+                .allGrouping(PARTIAL_H); */
 
-        /* builder.setBolt(COUNT_BY_D, new CountByDayBolt(), 1)
+        builder.setBolt(COUNT_BY_D, new CountByDayBolt(), 1)
                 .allGrouping(PARSER)
                 .allGrouping(METRONOME, METRONOME_D_STREAM_ID);
 
@@ -65,7 +65,7 @@ public class TopologyQ1 {
         builder.setBolt(GLOBAL_D, new GlobalRankBolt(3))
                 .allGrouping(PARTIAL_D);
 
-        builder.setBolt(COUNT_BY_W, new CountByWeekBolt(), 1)
+        /* builder.setBolt(COUNT_BY_W, new CountByWeekBolt(), 1)
                 .fieldsGrouping(PARSER, new Fields(ARTICLE_ID))
                 .allGrouping(METRONOME, METRONOME_D_STREAM_ID);
 

@@ -19,7 +19,7 @@ First move to /dist directory and launch
 sh startEnvironment.sh
 ```
 
-Then, from script directory launch
+Then, from /script directory launch
 
 ```
 sh createTopic.sh

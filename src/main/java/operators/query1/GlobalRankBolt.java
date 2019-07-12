@@ -121,7 +121,7 @@ public class GlobalRankBolt extends BaseRichBolt {
 
         FileWriter fw = new FileWriter();
         try {
-            fw.writeResult("Result_q1_p1", String.valueOf(result));
+            fw.writeResult("Result_q1_d_p1", String.valueOf(result));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -138,13 +138,13 @@ public class GlobalRankBolt extends BaseRichBolt {
 
         //this.throughput = 0;
 
-        System.out.println("Throughput query 1: " + res);
+        /*System.out.println("Throughput query 1: " + res);
         FileWriter fw2 = new FileWriter();
         try {
             fw2.writeResult("thr_count_by_d_q1_p1", String.valueOf(res));
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
         if(nLatency == 0) {
             nLatency = 1;
