@@ -96,32 +96,22 @@ public class GlobalRankBolt extends BaseRichBolt {
     private void createOutputResponse(long tupleTimestamp) {
 
         Date date = DateUtils.getDate(tupleTimestamp);
-        Ranking global = topKranking.getTopK();
-        List<RankItem> items = global.getRanking();
-        //List<RankItem> globalRanking = topKranking.getTopK().getRanking();
-        //System.out.println("GLOBAL RANKING: " + globalRanking);
+        List<RankItem> globalRanking = topKranking.getTopK().getRanking();
 
         String result = "";
         result = result.concat(String.valueOf(date)).concat(": ");
 
 
-        for(int i = 0; i < items.size(); i++) {
-            RankItem item = items.get(i);
+        for(int i = 0; i < globalRanking.size(); i++) {
+            RankItem item = globalRanking.get(i);
             result += " " + item.getArticleID() + ", " + item.getPopularity();
-        }
-
-        if(items.size() < k){
-            int i = k - items.size();
-            for(int j = 0; j < i; j++){
-                result += ", NULL";
-            }
         }
 
         System.err.println("RESULT: " + result);
 
         FileWriter fw = new FileWriter();
         try {
-            fw.writeResult("Result_q1_d_p1", String.valueOf(result));
+            fw.writeResult("Result_q1_month_p1", String.valueOf(result));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -136,15 +126,15 @@ public class GlobalRankBolt extends BaseRichBolt {
 
         this.currentTime = System.currentTimeMillis();
 
-        //this.throughput = 0;
+        this.throughput = 0;
 
-        /*System.out.println("Throughput query 1: " + res);
+        System.out.println("Throughput query 1: " + res);
         FileWriter fw2 = new FileWriter();
         try {
             fw2.writeResult("thr_count_by_d_q1_p1", String.valueOf(res));
         } catch (IOException e) {
             e.printStackTrace();
-        }*/
+        }
 
         if(nLatency == 0) {
             nLatency = 1;
