@@ -84,6 +84,8 @@ public class GlobalRankBolt extends BaseRichBolt {
 
             updateMetrics();
 
+            this.throughput = 0;
+
         }
 
         _collector.ack(tuple);
@@ -134,7 +136,7 @@ public class GlobalRankBolt extends BaseRichBolt {
 
         this.currentTime = System.currentTimeMillis();
 
-        this.throughput = 0;
+        //this.throughput = 0;
 
         System.out.println("Throughput query 1: " + res);
         FileWriter fw2 = new FileWriter();

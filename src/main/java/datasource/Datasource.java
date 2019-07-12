@@ -8,7 +8,8 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.TimeZone;
 
-import static main.java.config.Configuration.*;
+import static main.java.config.Configuration.DATASET;
+import static main.java.config.Configuration.TOPIC_1_INPUT;
 
 public class Datasource implements Runnable {
 
@@ -44,7 +45,6 @@ public class Datasource implements Runnable {
                 long nextTime = getEventTime(line);
                 long sleepTime = (int) Math.floor(((double) (nextTime - previousTime ) / (TIMESPAN * 60 * 1000)));
                 long deltaIntervalToSkip = SPEEDUP - (System.currentTimeMillis() - latestSendingTime);
-                //sleepTime = sleepTime + deltaIntervalToSkip;
                 if(sleepTime > 0) {
 
                     //System.out.println(" sleep for :" + sleepTime + " ms");
