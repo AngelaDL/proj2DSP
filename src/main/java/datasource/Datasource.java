@@ -1,59 +1,95 @@
 package main.java.datasource;
 
+import main.java.kafka.SimpleKakfaProducer;
+
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Date;
+import java.util.TimeZone;
 
-import main.java.config.Configuration;
-import main.java.kafka.*;
+import static main.java.config.Configuration.*;
 
-public class Datasource {
+public class Datasource implements Runnable {
 
-    public static void main(String[] args) {
+    private static final int TIMESPAN = 1; 		// expressed in mins
+    private static final int SPEEDUP = 1000; 	// expressed in ms
 
-        SimpleKakfaProducer producer = new SimpleKakfaProducer(Configuration.TOPIC_1_INPUT);
+    private SimpleKakfaProducer producer;
 
+    public Datasource() {
+
+        this.producer =  new SimpleKakfaProducer(TOPIC_1_INPUT);
+
+    }
+
+
+    @Override
+    public void run() {
         BufferedReader br = null;
-        String line = "";
 
         try {
-
-            br = new BufferedReader(new FileReader(Configuration.DATASET));
-
+            System.out.println("Initializing... ");
+            br = new BufferedReader(new FileReader(DATASET));
             String header = br.readLine();
-            String firstLine = br.readLine();
-            long eventTime = getEventTime(firstLine);
+            System.out.println("HEADER: " + header);
 
-            producer.produce(null, firstLine);
+            String line = br.readLine();
+            long previousTime = getEventTime(line);
+            long latestSendingTime = System.currentTimeMillis();
+            producer.produce(null, line);
 
-            int k = 0;
-            while ((line = br.readLine()) != null && k<3000) {
-                {
-                    long actualEventTime = getEventTime(line);
-                    long diff = (actualEventTime - eventTime);// /1000
-                    Thread.sleep(diff);
-                    eventTime = actualEventTime;
-                    producer.produce(null, line);
-                    k++;
+            while ((line = br.readLine()) != null) {
+
+                long nextTime = getEventTime(line);
+                long sleepTime = (int) Math.floor(((double) (nextTime - previousTime ) / (TIMESPAN * 60 * 1000)));
+                long deltaIntervalToSkip = SPEEDUP - (System.currentTimeMillis() - latestSendingTime);
+                //sleepTime = sleepTime + deltaIntervalToSkip;
+                if(sleepTime > 0) {
+
+                    //System.out.println(" sleep for :" + sleepTime + " ms");
+
+                    try {
+                        Thread.sleep(sleepTime);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
+
+                producer.produce(null, line);
+                latestSendingTime = System.currentTimeMillis();
+                previousTime = nextTime;
+
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
+        if (br != null){
+            try {
+                br.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private static long getEventTime(String line) {
-        long ts = 0;
-        String[] tokens = line.split(",");
-        ts = Long.parseLong(tokens[5]);
-        return ts;
+
+        String[] tokens	= line.split(",");
+        long ts = Long.valueOf(tokens[5])*1000;
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+        Date d = new Date(ts);
+        return d.getTime();
 
     }
+
+    public static void main(String[] args) {
+
+        Datasource fill = new Datasource();
+        Thread th1 = new Thread(fill);
+        th1.start();
+    }
+
 
 }

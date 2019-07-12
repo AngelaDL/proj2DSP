@@ -32,6 +32,7 @@ public class CountByMonth extends BaseRichBolt {
     private long currentTime;
     private long responseTime;
     private long nResponseTime;
+    private long throughput;
 
     @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
@@ -43,6 +44,7 @@ public class CountByMonth extends BaseRichBolt {
         this.currentTime = 0;
         this.responseTime = 0;
         this.nResponseTime = 0;
+        this.throughput = 0;
 
         Properties properties = new Properties();
         properties.put("bootstrap.servers", KAFKA_PORT);
@@ -92,7 +94,7 @@ public class CountByMonth extends BaseRichBolt {
                 System.out.println("Result: " + result + "]");
                 FileWriter fw = new FileWriter();
                 try {
-                    fw.writeResult("count_by_m_q2_p3", result);
+                    fw.writeResult("count_by_m_q2_p1", result);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -104,9 +106,9 @@ public class CountByMonth extends BaseRichBolt {
                 // Aggiorno il timestamp
                 this.lastTick = tupleTimestamp;
             }
-            this.stat += 1;
-            long ts = tuple.getLongByField(CREATE_DATE);
-            updateMetrics(ts);
+            this.throughput += 1;
+                long ts = tuple.getLongByField(CREATE_DATE);
+                updateMetrics(ts);
         }
 
         else {
@@ -129,12 +131,12 @@ public class CountByMonth extends BaseRichBolt {
 
         this.currentTime = System.currentTimeMillis();
 
-        this.stat = 0;
+        this.throughput = 0;
 
         System.out.println("Throughput Week query 2: " + res);
         FileWriter fw2 = new FileWriter();
         try {
-            fw2.writeResult("thr_count_by_m_q2_p3", String.valueOf(res));
+            fw2.writeResult("thr_count_by_m_q2_p1", String.valueOf(res));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -149,7 +151,7 @@ public class CountByMonth extends BaseRichBolt {
         System.out.println("Response Time Week query 2" + avgResponseTime);
         FileWriter fw3 = new FileWriter();
         try {
-            fw3.writeResult("respTime_count_by_m_q2_p3", String.valueOf(avgResponseTime));
+            fw3.writeResult("respTime_count_by_m_q2_p1", String.valueOf(avgResponseTime));
         } catch (IOException e) {
             e.printStackTrace();
         }

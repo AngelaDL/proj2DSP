@@ -1,9 +1,6 @@
 package main.java.operators.query1;
 
-import main.java.utils.DateUtils;
-import main.java.utils.RankItem;
-import main.java.utils.Ranking;
-import main.java.utils.TopKRanking;
+import main.java.utils.*;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -13,10 +10,8 @@ import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Tuple;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.io.IOException;
+import java.util.*;
 
 import static main.java.config.Configuration.*;
 
@@ -26,16 +21,25 @@ public class GlobalRankBolt extends BaseRichBolt {
     private KafkaProducer<String, String> producer;
     private TopKRanking topKranking;
     private int k;
-    private String kafkaTopic;
+
+    private int throughput;
+    private long currentTime;
+    private long latency;
+    private long nLatency;
 
     public GlobalRankBolt(int k) {
+        super();
         this.k = k;
+        this.latency = 0;
+        this.nLatency = 0;
     }
 
     @Override
-    public void prepare(@SuppressWarnings("rawtypes")Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
+    public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         this._collector = outputCollector;
         this.topKranking = new TopKRanking(k);
+        this.throughput = 0;
+        this.currentTime = 0;
 
         Properties props = new Properties();
         props.put("bootstrap.servers", KAFKA_PORT);
@@ -48,51 +52,113 @@ public class GlobalRankBolt extends BaseRichBolt {
     @Override
     public void execute(Tuple tuple) {
 
-        boolean updated = false;
+        if (this.throughput == 0) {
+            this.currentTime = System.currentTimeMillis();
+        }
+
         long tupleTimestamp = tuple.getLongByField(CREATE_DATE);
         long currentTimestamp = tuple.getLongByField(CURRENT_TIMESTAMP);
-        String metronomeMsg = tuple.getStringByField(TIME_ID);
+        String msgType = tuple.getStringByField(TIME_ID);
+
 
         Ranking partialRanking = (Ranking) tuple.getValueByField(PARTIAL_RANKING);
 
+        /* update global rank */
+        boolean updated = false;
         for (RankItem item : partialRanking.getRanking()) {
             updated |= topKranking.update(item);
-            //System.out.println(updated);
+            //System.out.println("PROVA: " + DateUtils.getDate(item.getTimestamp()));
+            //System.out.println("PROVA: " + DateUtils.getDate(item.getTimestamp()) + ": " + item.getArticleID() + " " + item.getPopularity());
         }
 
+        long ts = System.currentTimeMillis() - tuple.getLongByField(CURRENT_TIMESTAMP);
+        latency += ts;
+        nLatency++;
+
+        /* Emit if the local top3 is changed */
         if (updated) {
-            //System.out.println("Sono entrato");
-            createOutputResponse(currentTimestamp, tupleTimestamp);
+
+            createOutputResponse(tupleTimestamp);
+
+            this.throughput += 1;
+
+            updateMetrics();
+
         }
 
         _collector.ack(tuple);
     }
 
-    private void createOutputResponse(long currentTimestamp, long tupleTimestamp) {
+
+
+    private void createOutputResponse(long tupleTimestamp) {
 
         Date date = DateUtils.getDate(tupleTimestamp);
-        List<RankItem> globalRanking = topKranking.getTopK().getRanking();
+        Ranking global = topKranking.getTopK();
+        List<RankItem> items = global.getRanking();
+        //List<RankItem> globalRanking = topKranking.getTopK().getRanking();
+        //System.out.println("GLOBAL RANKING: " + globalRanking);
 
-        //String result = tupleTimestamp + ", ";
         String result = "";
-        result = result.concat(String.valueOf(date));
+        result = result.concat(String.valueOf(date)).concat(": ");
 
-        for(int i = 0; i < globalRanking.size(); i++) {
-            RankItem item = globalRanking.get(i);
-            result = result + ", " + item.getArticleID() + ", " + item.getPopularity();
+
+        for(int i = 0; i < items.size(); i++) {
+            RankItem item = items.get(i);
+            result += " " + item.getArticleID() + ", " + item.getPopularity();
+        }
+
+        if(items.size() < k){
+            int i = k - items.size();
+            for(int j = 0; j < i; j++){
+                result += ", NULL";
+            }
         }
 
         System.err.println("RESULT: " + result);
 
-        if(globalRanking.size() < k){
-            int i = k - globalRanking.size();
-            for(int j = 0; j < i; j++){
-                result += "NULL";
-                result += ", ";
-            }
+        FileWriter fw = new FileWriter();
+        try {
+            fw.writeResult("Result_q1_p1", String.valueOf(result));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         producer.send(new ProducerRecord<String, String>(TOPIC_1_OUTPUT, result));
+    }
+
+
+    public void updateMetrics(){
+
+        double res = (double) 100 / (double) (System.currentTimeMillis() - this.currentTime);
+
+        this.currentTime = System.currentTimeMillis();
+
+        this.throughput = 0;
+
+        System.out.println("Throughput query 1: " + res);
+        FileWriter fw2 = new FileWriter();
+        try {
+            fw2.writeResult("thr_count_by_d_q1_p1", String.valueOf(res));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if(nLatency == 0) {
+            nLatency = 1;
+        }
+
+        double avgResponseTime = (double) latency / (double) nLatency;
+        latency = 0;
+        nLatency = 0;
+
+        System.out.println("Response Time query 1: " + avgResponseTime);
+        FileWriter fw3 = new FileWriter();
+        try {
+            fw3.writeResult("respT_count_by_d_q1_p1", String.valueOf(avgResponseTime));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

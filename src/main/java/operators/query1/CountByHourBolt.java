@@ -1,6 +1,5 @@
 package main.java.operators.query1;
 
-import main.java.operators.MetronomeBolt;
 import main.java.utils.DateUtils;
 import main.java.utils.Window;
 import org.apache.storm.task.OutputCollector;
@@ -45,9 +44,15 @@ public class CountByHourBolt extends BaseRichBolt {
                 // Control: only informations relating to the current window are processed
                 for (String articleID : map.keySet()) {
                     Window window = map.get(articleID);
+                    long estimatedTotal = window.getEstimatedTotal();
 
-                    Values values = new Values(tupleTimestamp, currentTimestamp, H_ID, articleID, window.getEstimatedTotal());
-                    //System.out.println(DateUtils.getDate(tupleTimestamp) + " " + values);
+                    Values values = new Values();
+                    values.add(tupleTimestamp);
+                    values.add(currentTimestamp);
+                    values.add(H_ID);
+                    values.add(articleID);
+                    values.add(estimatedTotal);
+                    //System.out.println("COUNT BY H: " + DateUtils.getDate(tupleTimestamp) + " " + values);
 
                     _collector.emit(values);
 

@@ -36,20 +36,21 @@ public class CountByDayBolt extends BaseRichBolt {
             long tupleTimestamp = tuple.getLongByField(CREATE_DATE);
             long currentTimestamp = tuple.getLongByField(CURRENT_TIMESTAMP);
             if(tupleTimestamp > this.lastTick){
-                int elapsedHour = (int) Math.ceil(((tupleTimestamp - lastTick) / (1000*60)) / 10);
+                int elapsedHour = (int) Math.ceil((tupleTimestamp - lastTick) / (1000*60));
                 System.out.println(msgType);
                 //System.err.println("ELAPSED: " + elapsedHour);
 
                 // Control: only informations relating to the current window are processed
                 for (String articleID : map.keySet()) {
                     Window window = map.get(articleID);
+                    long estimatedTotal = window.getEstimatedTotal();
 
                     Values values = new Values();
                     values.add(tupleTimestamp);
                     values.add(currentTimestamp);
                     values.add(D_ID);
                     values.add(articleID);
-                    values.add(window.getEstimatedTotal());
+                    values.add(estimatedTotal);
 
                     _collector.emit(values);
 
@@ -74,7 +75,6 @@ public class CountByDayBolt extends BaseRichBolt {
                     map.put(articleID, window);
                 }
 
-                //System.out.println("WINDOW: " + window.getEstimatedTotal());
                 window.increment();
             }
         }

@@ -24,7 +24,6 @@ public class CountByDay extends BaseRichBolt {
 
     private OutputCollector _collector;
     private SlotBasedWindow window;
-    //private int current;
     private long lastTick;
     private KafkaProducer<String, String> producer;
     private int stat;
@@ -43,7 +42,6 @@ public class CountByDay extends BaseRichBolt {
         this.nResponseTime = 0;
         this.throughput = 0;
         this.currentTime = 0;
-        //this.current = 0;
 
         Properties properties = new Properties();
         properties.put("bootstrap.servers", KAFKA_PORT);
@@ -88,7 +86,7 @@ public class CountByDay extends BaseRichBolt {
 
                 FileWriter fw = new FileWriter();
                 try {
-                    fw.writeResult("count_by_d_q2_p3", result);
+                    fw.writeResult("count_by_d_q2_p1", result);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -103,11 +101,9 @@ public class CountByDay extends BaseRichBolt {
                 this.lastTick = tupleTimestamp;
             }
 
-            this.stat += 1;
-            //if(stat == 24){
-                long ts = tuple.getLongByField(CREATE_DATE);
-                updateMetrics(ts);
-            //}
+            this.throughput += 1;
+            long ts = tuple.getLongByField(CREATE_DATE);
+            updateMetrics(ts);
         }
 
         // When a msg from parser is received, it handles memorization operations in the window
@@ -133,12 +129,12 @@ public class CountByDay extends BaseRichBolt {
 
         this.currentTime = System.currentTimeMillis();
 
-        this.stat = 0;
+        this.throughput = 0;
 
         System.out.println("Throughput daily query 2: " + res);
         FileWriter fw2 = new FileWriter();
         try {
-            fw2.writeResult("thr_count_by_d_q2_p3", String.valueOf(res));
+            fw2.writeResult("thr_count_by_d_q2_p1", String.valueOf(res));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -153,7 +149,7 @@ public class CountByDay extends BaseRichBolt {
         System.out.println("Response Time Daily query 2" + avgResponseTime);
         FileWriter fw3 = new FileWriter();
         try {
-            fw3.writeResult("respT_count_by_d_q2_p3", String.valueOf(avgResponseTime));
+            fw3.writeResult("respT_count_by_d_q2_p1", String.valueOf(avgResponseTime));
         } catch (IOException e) {
             e.printStackTrace();
         }
